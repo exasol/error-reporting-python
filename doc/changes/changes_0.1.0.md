@@ -7,6 +7,7 @@ Code Name: Exasol python error code builder
 ### Features
 
   - #1: Added initial project setup
+  - #3: Added error code builder
 
 
     
