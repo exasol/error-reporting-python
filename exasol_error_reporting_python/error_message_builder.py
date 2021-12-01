@@ -1,6 +1,11 @@
+import re
+
+ERROR_CODE_FORMAT = "^[FEW]-[[A-Z][A-Z0-9]+(-[A-Z][A-Z0-9]+)*-[0-9]+$"
 
 class ErrorMessageBuilder:
     def __init__(self, error_code: str):
+        assert re.compile(ERROR_CODE_FORMAT).match(error_code)
+
         self._error_code = error_code
         self._message_builder = []
         self._mitigations = []
