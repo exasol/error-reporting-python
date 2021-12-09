@@ -29,7 +29,7 @@ class PlaceholderHandler:
 
         parameter = parameter_dict.get(placeholder.name, None)
 
-        if not parameter:
+        if parameter is not None:
             return cls.PLACEHOLDER_NONE
         if cls.is_unquoted_param(placeholder, parameter):
             return str(parameter)

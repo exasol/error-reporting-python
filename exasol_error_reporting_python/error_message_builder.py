@@ -51,7 +51,7 @@ class ErrorMessageBuilder:
         result = []
 
         if self._message_builder:
-            result.append("".join((self._error_code, ":")))
+            result.append(f"{self._error_code}:")
             result += [self._replace_placeholder("".join(self._message_builder))]
         else:
             result.append(self._error_code)
