@@ -23,7 +23,10 @@ class ErrorMessageBuilder:
         """
         Add the given error message to the error builder list and invokes
         the method that perform mapping of the given parameters with the
-        placeholders in the message.
+        placeholders in the message. This class allows multiple calls for
+        message or mitigation methods, in this case the text given in
+        message or mitigation is appended to the list of the corresponding
+        method.
 
         :param message: an error message that may contain placeholders
         :param arguments: a tuple of parameters to replace with the placeholders
