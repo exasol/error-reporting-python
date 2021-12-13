@@ -1,0 +1,39 @@
+name: Release Droid - Upload GitHub Release Assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_url:
+        description: 'Upload URL'
+        required: true
+
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        python-version: [ 3.6 ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.6
+      - name: Install Poetry
+        run: poetry install
+      - name: Build Poetry
+        run: poetry build
+
+      - name: Checkout test environment
+        run: git clone https://github.com/exasol/integration-test-docker-environment.git
+        working-directory: ..
+      - name: Spawn EXASOL environemnt
+        run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --db-mem-size 4GB
+        working-directory: ../integration-test-docker-environment
+
+      - name: Poetry run pytest integration tests
+        run: poetry run pytest tests
