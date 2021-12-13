@@ -27,13 +27,5 @@ jobs:
         run: poetry install
       - name: Build Poetry
         run: poetry build
-
-      - name: Checkout test environment
-        run: git clone https://github.com/exasol/integration-test-docker-environment.git
-        working-directory: ..
-      - name: Spawn EXASOL environemnt
-        run: ./start-test-env spawn-test-environment --environment-name test --database-port-forward 8888 --bucketfs-port-forward 6666 --db-mem-size 4GB
-        working-directory: ../integration-test-docker-environment
-
       - name: Poetry run pytest integration tests
         run: poetry run pytest tests
