@@ -22,7 +22,7 @@ class ErrorMessageBuilder:
     def message(self, message: str, *arguments):
         """
         Add the given error message to the error builder list and invokes
-        the method that perform mapping of the given parameters with the
+        the method that performs mapping of the given parameters with the
         placeholders in the message. This class allows multiple calls for
         message or mitigation methods, in this case the text given in
         message or mitigation is appended to the list of the corresponding

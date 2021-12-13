@@ -7,16 +7,15 @@ so that you can extract an error catalog from the code.
 
 ## Attributes of Error Builder
 
-Error messages are built in `ExaError` using following predefined attributes. 
-All attributes of the error object except the error code are optional. Thus, 
-after the error-code is provided, whether other attributes are provided or not 
-will not cause any error. Please keep in mind that error-code should satisfy 
-error-code format (see [error-code](#error-code)).
+Error messages are built in `ExaError` using the following predefined attributes. 
+All attributes of the error object except the error code are optional. Thus, the 
+`ExaError` will still work, even if the other attributes are not provided. Please 
+keep in mind that error-code should satisfy error-code format 
+(see [error-code](#error-code)).
 
 Flexibility is provided by introducing placeholder parameters to the error 
 message in two ways: (1) via the `parameter` attribute and (2) with positional 
-arguments. Furthermore, placeholders without parameters are filled with the 
-<null>.
+arguments. Furthermore, placeholders without parameters are filled with <null>.
 
 #### error-code
 This attribute should be defined in the error message and provide the following 
@@ -35,32 +34,34 @@ Examples of valide error codes:
 - F-VS-QRW-13
 
 #### message
-This attribute includes error description which can be given by either as static 
-string or containing placeholders in double curly brackets. Parameters of 
-placeholders in the error message can be given as positional arguments 
-as well as using the `parameter` attribute. The following two usage give the 
-same message (`Error message with value`):
+This attribute includes error description which can be given by either a static
+string or a string containing placeholders in double curly brackets. Parameters 
+of placeholders in the error message can be given as positional arguments 
+as well as using the `parameter` attribute. The following two usages result in 
+the same message (`Error message with value`):
 - `.message("Error message with {{parameter}}", "value")`
 - `.message("Error message with {{parameter}}").parameter("parameter", "value")`
 
-Furthermore, multiple calls of `message` method will append the corresponding 
-message to previous ones.
+Furthermore, multiple calls of the `message` method will append the corresponding 
+message to the previous ones.
 
 #### mitigation
 This attribute provides a list of hints on how to fix the error. Its method 
-structure is same as `message` attribute. Parameters of  placeholders in the 
-mitigations can be given as positional arguments  as well as using the 
-`parameter` attribute. Similar to `message` method, multiple calls of 
-`mitigation` method will append the corresponding mitigation to previous ones.
+structure is the same as for the `message` attribute. Parameters of placeholders 
+in the mitigations can be given as positional arguments  as well as using the 
+`parameter` attribute. Similar to the `message` method, multiple calls of 
+the `mitigation` method will append the corresponding mitigation to the 
+previous ones.
  
 Furthermore, if the only message we can give is to open a ticket, the 
 `ticket mitigation()` method can be called, which provides a predefined message 
 about it.
    
 #### parameter
-This attribute takes as argument the placeholder name and the parameter value 
-that will replace this placeholder. It can be used for both message and 
-mitigations.
+This attribute takes the placeholder name and the parameter value 
+that will replace this placeholder as argument. It can be used for both message 
+and mitigations. For example usages, please see the 
+[Parameters](#Parameters) section.
 
 ## Usage 
 
@@ -76,7 +77,7 @@ E-TEST-1: Something went wrong.
 
 ### Parameters
 You can specify placeholders in the message and replace them with 
-parameters values:
+parameters values.
 
 ```python
 ExaError.message_builder("E-TEST-2")
