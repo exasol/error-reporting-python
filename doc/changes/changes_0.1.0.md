@@ -1,6 +1,6 @@
 # error-reporting-python 0.1.0, released 2021-12-13
 
-Code Name: Exasol python error code builder
+Code Name: Add Python-Builder for Exasol error messages
 
 ## Summary
 
@@ -12,6 +12,6 @@ structure. In addition it can contain one or more error messages and mitigation 
 
   - #1: Added initial project setup
   - #3: Added error code builder
-
+  - #6: Prepared for the first release
 
     
