@@ -13,7 +13,7 @@ class ErrorMessageBuilder:
 
     def __init__(self, error_code: str):
         if not re.compile(ERROR_CODE_FORMAT).match(error_code):
-            raise Exception(f"{error_code} is an invalid error-code format")
+            raise ValueError(f"{error_code} is an invalid error-code format")
 
         self._error_code = error_code
         self._message_builder = []
