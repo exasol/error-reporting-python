@@ -22,5 +22,5 @@ jobs:
         run: poetry install
       - name: Poetry build
         run: poetry build
-      - name: Poetry run pytest integration tests
+      - name: Poetry run tests
         run: poetry run pytest tests

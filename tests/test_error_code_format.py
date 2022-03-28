@@ -1,4 +1,7 @@
 import unittest
+
+import pytest
+
 from exasol_error_reporting_python.error_message_builder import \
     ErrorMessageBuilder
 
@@ -14,8 +17,8 @@ class TestErrorCode(unittest.TestCase):
             "F-100"
         ]
         for error_code in invalid_error_code_list:
-            with self.assertRaises(AssertionError):
-                builder = ErrorMessageBuilder(error_code)
+            with pytest.raises(ValueError):
+                assert ErrorMessageBuilder(error_code)
 
     def test_valid_error_code_format(self):
         valid_error_code_list = [

@@ -3,7 +3,7 @@ from typing import Any
 from exasol_error_reporting_python.parameters_mapper import ParametersMapper
 from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
 
-ERROR_CODE_FORMAT = "^[FEW]-[[A-Z][A-Z0-9]+(-[A-Z][A-Z0-9]+)*-[0-9]+$"
+ERROR_CODE_FORMAT = "^[FEW]-[A-Z][A-Z0-9]+(-[A-Z][A-Z0-9]+)*-[0-9]+$"
 
 
 class ErrorMessageBuilder:
@@ -12,7 +12,8 @@ class ErrorMessageBuilder:
     """
 
     def __init__(self, error_code: str):
-        assert re.compile(ERROR_CODE_FORMAT).match(error_code)
+        if not re.compile(ERROR_CODE_FORMAT).match(error_code):
+            raise ValueError(f"{error_code} is an invalid error-code format")
 
         self._error_code = error_code
         self._message_builder = []
@@ -129,4 +130,3 @@ class ErrorMessageBuilder:
             result.append("\n".join(mitigations))
 
         return " ".join(result)
-
