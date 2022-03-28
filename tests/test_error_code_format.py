@@ -17,7 +17,7 @@ class TestErrorCode(unittest.TestCase):
             "F-100"
         ]
         for error_code in invalid_error_code_list:
-            with pytest.raises(Exception):
+            with pytest.raises(ValueError):
                 assert ErrorMessageBuilder(error_code)
 
     def test_valid_error_code_format(self):
