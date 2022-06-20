@@ -5,8 +5,8 @@ description = "Exasol Python Error Reporting"
 license = "MIT"
 
 authors = [
-    	"Umit Buyuksahin <umit.buyuksahin@exasol.com>",
-    	"Torsten Kilias <torsten.kilias@exasol.com>"
+    "Umit Buyuksahin <umit.buyuksahin@exasol.com>",
+    "Torsten Kilias <torsten.kilias@exasol.com>"
 ]
 
 
@@ -19,7 +19,7 @@ keywords = ['exasol', 'python', 'error-reporting']
 
 
 [tool.poetry.dependencies]
-python = ">=3.6.1,<4.0"
+python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

@@ -19,7 +19,7 @@ setup_kwargs = {
     'url': 'https://github.com/exasol/error-reporting-python',
     'packages': packages,
     'package_data': package_data,
-    'python_requires': '>=3.6.1,<4.0',
+    'python_requires': '>=3.8,<4.0',
 }
 
 
