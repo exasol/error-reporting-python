@@ -1,6 +1,6 @@
 name: Run pytest tests
 
-on: [ push, pull_request ]
+on: [ push ]
 
 jobs:
   integration_tests:
