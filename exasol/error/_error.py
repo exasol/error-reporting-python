@@ -15,7 +15,13 @@ class Parameter:
 
 
 class Error:
-    def __init__(self, name, message, mitigations, parameters):
+    def __init__(
+        self,
+        name: str,
+        message: str,
+        mitigations: Union[str, Iterable[str]],
+        parameters: Mapping[str, Union[str, Parameter]],
+    ):
         def build_error(code, msg, mitigations, params):
             builder = exa_error.ExaError.message_builder(code)
             builder.message(msg)
