@@ -1,4 +1,3 @@
-import dataclasses
 import warnings
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -9,15 +8,8 @@ with warnings.catch_warnings():
     from exasol_error_reporting_python import exa_error
 
 
-def _to_iterable(value):
-    if isinstance(value, Iterable):
-        return value
-    return [value]
-
-
 @dataclass(frozen=True)
 class Parameter:
-    name: str
     value: str
     description: Union[None, str]
 
@@ -27,21 +19,18 @@ class Error:
         def build_error(code, msg, mitigations, params):
             builder = exa_error.ExaError.message_builder(code)
             builder.message(msg)
+
             for mitigation in mitigations:
                 builder.mitigation(mitigation)
-            if isinstance(params, dict):
-                for k, v in params.items():
-                    builder.parameter(k, v, "")
-            else:
-                for parameter in params:
-                    if isinstance(parameter, Parameter):
-                        parameter = dataclasses.asdict(parameter)
-                    builder.parameter(*parameter.values())
-            return builder
 
-        # treat single values also as iterable
-        mitigations = _to_iterable(mitigations)
-        parameters = _to_iterable(parameters)
+            for k, v in params.items():
+                name, value, description = k, v, ""
+                if isinstance(v, Parameter):
+                    value = v.value
+                    description = v.description
+                builder.parameter(name, value, description)
+
+            return builder
 
         self._error = build_error(name, message, mitigations, parameters)
 
@@ -55,7 +44,7 @@ def ExaError(
     name: str,
     message: str,
     mitigations: Union[str, Iterable[str]],
-    parameters: Union[Parameter, Mapping[str, str], Iterable[Parameter]],
+    parameters: Mapping[str, Union[str, Parameter]],
 ) -> Error:
     """Create a new ExaError.
 

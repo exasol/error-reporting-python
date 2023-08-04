@@ -24,10 +24,10 @@ def does_not_raise():
         (
             cleandoc(
                 """
-                    E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
-                    * Delete something from '/dev/sda1'.
-                    * Create larger partition.
-                    """
+                        E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
+                        * Delete something from '/dev/sda1'.
+                        * Create larger partition.
+                        """
             ),
             Data(
                 code="E-TEST-1",
@@ -36,16 +36,16 @@ def does_not_raise():
                     "Delete something from {{device}}.",
                     "Create larger partition.",
                 ],
-                parameters=[Parameter("device", "/dev/sda1", "name of the device")],
+                parameters={"device": Parameter("/dev/sda1", "name of the device")},
             ),
         ),
         (
             cleandoc(
                 """
-                        E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
-                        * Delete something from '/dev/sda1'.
-                        * Create larger partition.
-                        """
+                            E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
+                            * Delete something from '/dev/sda1'.
+                            * Create larger partition.
+                            """
             ),
             Data(
                 code="E-TEST-1",
@@ -80,7 +80,7 @@ def test_exa_error_as_string(expected, data):
                     "Delete something from {{device}}.",
                     "Create larger partition.",
                 ],
-                parameters=[Parameter("device", "/dev/sda1", "name of the device")],
+                parameters={"device": Parameter("/dev/sda1", "name of the device")},
             )
         ),
     ],
