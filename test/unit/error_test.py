@@ -39,6 +39,24 @@ def does_not_raise():
                 parameters=[Parameter("device", "/dev/sda1", "name of the device")],
             ),
         ),
+        (
+            cleandoc(
+                """
+                        E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
+                        * Delete something from '/dev/sda1'.
+                        * Create larger partition.
+                        """
+            ),
+            Data(
+                code="E-TEST-1",
+                message="Not enough space on device {{device}}.",
+                mitigations=[
+                    "Delete something from {{device}}.",
+                    "Create larger partition.",
+                ],
+                parameters={"device": "/dev/sda1"},
+            ),
+        ),
     ],
 )
 def test_exa_error_as_string(expected, data):
