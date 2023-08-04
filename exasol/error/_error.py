@@ -1,7 +1,7 @@
 import warnings
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, List
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -49,7 +49,7 @@ class Error:
 def ExaError(
     name: str,
     message: str,
-    mitigations: Union[str, Iterable[str]],
+    mitigations: Union[str, List[str]],
     parameters: Mapping[str, Union[str, Parameter]],
 ) -> Error:
     """Create a new ExaError.
