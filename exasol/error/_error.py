@@ -69,7 +69,7 @@ def ExaError(
 
     Raises:
         This function should not raise under any circumstances.
-        In case of error it should report it also as an error type which is returned by this function.
+        In case of error, it should report it also as an error type which is returned by this function.
         Still the returned error should contain a references or information about the original call.
 
         Attention:
@@ -77,9 +77,9 @@ def ExaError(
             FIXME: Due to legacy reasons this function currently still may raise an `ValueError` (Refactoring Required).
 
             Potential error scenarios which should taken into account are the following ones:
-             * ExaError('ERP-1', 'Invalid error code provided.', [], []),
-             * ExaError('ERP-2', 'Invalid parameter specification.', [], []),
-             * ExaError('ERP-3', 'Invalid error message specification.', [], []),
-             * ExaError('ERP-4', 'Invalid mitigation specification.', [], []),
+             * ExaError('E-ERP-1', 'Invalid error code provided.', [], []),
+             * ExaError('E-ERP-2', 'Invalid parameter specification.', [], []),
+             * ExaError('E-ERP-3', 'Invalid error message specification.', [], []),
+             * ExaError('E-ERP-4', 'Invalid mitigation specification.', [], []),
     """
     return Error(name, message, mitigations, parameters)
