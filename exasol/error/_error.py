@@ -1,7 +1,7 @@
 import warnings
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Union, List
+from typing import Dict, List, Union
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -20,7 +20,7 @@ class Error:
         name: str,
         message: str,
         mitigations: Union[str, Iterable[str]],
-        parameters: Mapping[str, Union[str, Parameter]],
+        parameters: Dict[str, Union[str, Parameter]],
     ):
         def build_error(code, msg, mitigations, params):
             builder = exa_error.ExaError.message_builder(code)
