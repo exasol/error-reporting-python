@@ -78,6 +78,7 @@ def ExaError(
             FIXME: Due to legacy reasons this function currently still may raise an `ValueError` (Refactoring Required).
 
             Potential error scenarios which should taken into account are the following ones:
+
              * E-ERP-1: Invalid error code provided
                     params:
                         * Original ErrorCode
