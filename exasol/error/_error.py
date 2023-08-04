@@ -55,7 +55,7 @@ def ExaError(
     name: str,
     message: str,
     mitigations: Union[str, Iterable[str]],
-    parameters: Union[str, Parameter, Mapping[str, str], Iterable[Parameter]],
+    parameters: Union[Parameter, Mapping[str, str], Iterable[Parameter]],
 ) -> Error:
     """Create a new ExaError.
 
