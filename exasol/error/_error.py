@@ -22,6 +22,7 @@ class Error:
         mitigations: Union[str, Iterable[str]],
         parameters: Dict[str, Union[str, Parameter]],
     ):
+        # This function maybe flattened into or moved out of the constructor in the future.
         def build_error(code, msg, mitigations, params):
             builder = exa_error.ExaError.message_builder(code)
             builder.message(msg)
@@ -77,9 +78,18 @@ def ExaError(
             FIXME: Due to legacy reasons this function currently still may raise an `ValueError` (Refactoring Required).
 
             Potential error scenarios which should taken into account are the following ones:
-             * ExaError('E-ERP-1', 'Invalid error code provided.', [], []),
-             * ExaError('E-ERP-2', 'Invalid parameter specification.', [], []),
-             * ExaError('E-ERP-3', 'Invalid error message specification.', [], []),
-             * ExaError('E-ERP-4', 'Invalid mitigation specification.', [], []),
+             * E-ERP-1: Invalid error code provided
+                    params:
+                        * Original ErrorCode
+                        * Original error message
+                        * Original mitigations
+                        * Original parameters
+             * E-ERP-2 Unknown error/exception occurred
+                    params:
+                        * exception/msg
+                        * Original ErrorCode
+                        * Original error message
+                        * Original mitigations
+                        * Original parameters
     """
     return Error(name, message, mitigations, parameters)
