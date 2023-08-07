@@ -1,5 +1,9 @@
 [tool.poetry]
 name = "exasol-error-reporting-python"
+packages  = [
+    {include = "exasol"},
+    {include = "exasol_error_reporting_python"}
+]
 version = "0.4.0"
 description = "Exasol Python Error Reporting"
 license = "MIT"
