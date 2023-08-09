@@ -6,6 +6,9 @@ Code Name: T.B.D
 
 T.B.D
 
+## Feature
+  - #4: Add error parser/crawler cli tool
+
 ### Refactoring
 
   - #19: Rework error reporting API
