@@ -1,7 +1,6 @@
 import warnings
-from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Dict, Iterable, List, Mapping, Union
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
