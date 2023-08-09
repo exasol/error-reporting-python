@@ -324,6 +324,9 @@ def _argument_parser():
         description="Error Crawler",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+    parser.add_argument(
+        "--debug", action="store_true", help="Do not protect main entry point."
+    )
     subparsers = parser.add_subparsers()
 
     parse = subparsers.add_parser(
@@ -374,4 +377,20 @@ def _argument_parser():
 def main():
     parser = _argument_parser()
     args = parser.parse_args()
-    sys.exit(args.func(args))
+
+    def _unprotected(func, *args, **kwargs):
+        sys.exit(func(*args, **kwargs))
+
+    def _protected(func, *args, **kwargs):
+        try:
+            sys.exit(func(*args, **kwargs))
+        except Exception as ex:
+            print(
+                f"Error occurred, details: {ex}. Try running with --debug to get more details."
+            )
+            sys.exit(ExitCode.FAILURE)
+
+    if args.debug:
+        _unprotected(args.func, args)
+    else:
+        _protected(args.func, args)
