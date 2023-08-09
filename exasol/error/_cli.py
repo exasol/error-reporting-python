@@ -224,8 +224,8 @@ class ErrorCollector(ast.NodeVisitor):
             self._errors.extend(errors)
             return
 
-        error_definiton = self._make_error(node)
-        self._error_definitions.append(error_definiton)
+        error_definition = self._make_error(node)
+        self._error_definitions.append(error_definition)
 
     def generic_visit(self, node: ast.AST):
         raise NotImplementedError()
