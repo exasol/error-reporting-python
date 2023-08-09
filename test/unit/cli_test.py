@@ -1,9 +1,12 @@
 import ast
+import sys
 from inspect import cleandoc
 
 import pytest
 
 from exasol.error._cli import ErrorCodeDetails, ErrorCollector, Placeholder, Validation
+
+AST_NAME_CLASS = "ast.NAME" if sys.version_info.minor > 8 else "_ast.Name"
 
 
 @pytest.mark.parametrize(
@@ -69,7 +72,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             ),
             [
                 Validation.Error(
-                    message="description only can contain constant values, details: <class 'ast.Name'>",
+                    message=f"description only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=10,
                 )
@@ -93,7 +96,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             ),
             [
                 Validation.Error(
-                    message="error-codes only can contain constant values, details: <class 'ast.Name'>",
+                    message=f"error-codes only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=7,
                 )
@@ -117,7 +120,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             ),
             [
                 Validation.Error(
-                    message="mitigations only can contain constant values, details: <class 'ast.Name'>",
+                    message=f"mitigations only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=9,
                 )
@@ -141,7 +144,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             ),
             [
                 Validation.Error(
-                    message="mitigations only can contain constant values, details: <class 'ast.Name'>",
+                    message=f"mitigations only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=9,
                 )
