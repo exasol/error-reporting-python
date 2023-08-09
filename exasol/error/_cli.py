@@ -1,12 +1,13 @@
 import argparse
 import ast
+import io
 import json
 import sys
 from dataclasses import asdict, dataclass, is_dataclass
 from enum import IntEnum
 from itertools import chain
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple, Union
 
 
 class ExitCode(IntEnum):
@@ -61,32 +62,41 @@ class Validation:
 class ErrorCollector(ast.NodeVisitor):
     """ """
 
-    def __init__(self, filename="<Unknown>"):
+    def __init__(self, filename: str = "<Unknown>"):
         self._filename = filename
-        self._error_definitions = list()
-        self._errors = list()
-        self._warnings = list()
+        self._error_definitions: List[ErrorCodeDetails] = list()
+        self._errors: List[Validation.Error] = list()
+        self._warnings: List[Validation.Warning] = list()
 
     @property
-    def error_definitions(self):
+    def error_definitions(self) -> List[ErrorCodeDetails]:
         return self._error_definitions
 
     @property
-    def errors(self):
+    def errors(self) -> List[Validation.Error]:
         return self._errors
 
     @property
-    def warnings(self):
+    def warnings(self) -> List[Validation.Warning]:
         return self._warnings
 
     @staticmethod
-    def validate(node, file):
+    def validate(
+        node: ast.Call, file: str
+    ) -> Tuple[List[Validation.Error], List[Validation.Warning]]:
+        errors: List[Validation.Error]
+        warnings: List[Validation.Warning]
         errors, warnings = list(), list()
+
+        code: ast.Constant
+        message: ast.Constant
+        mitigations: Union[ast.Constant, ast.List]
+        parameters: ast.Dict
         code, message, mitigations, parameters = node.args
 
         # TODO: Add/Collect additional warnings:
-        #        * error message/mitigation defines a placeholder, but not parameter is provided
-        #        * error a parameter, but it is never used
+        #        * error message/mitigation defines a placeholder, but no parameter is provided
+        #        * error defines a parameter, but it is never used
         # TODO: Add/Collect additional errors:
         #        * check for invalid error code format
         #
@@ -162,14 +172,18 @@ class ErrorCollector(ast.NodeVisitor):
         return errors, warnings
 
     @staticmethod
-    def _is_exa_error(node):
+    def _is_exa_error(node: ast.AST) -> bool:
         if not isinstance(node, ast.Call):
             return False
         name = getattr(node.func, "id", "")
         name = getattr(node.func, "attr", "") if name == "" else name
         return name == "ExaError"
 
-    def _make_error(self, node):
+    def _make_error(self, node: ast.Call) -> ErrorCodeDetails:
+        code: ast.Constant
+        message: ast.Constant
+        mitigations: Union[ast.List, ast.Constant]
+        parameters: ast.Dict
         code, message, mitigations, parameters = node.args
 
         def normalize(params):
@@ -191,13 +205,15 @@ class ErrorCollector(ast.NodeVisitor):
             potentialCauses=None,
             mitigations=[m.value for m in mitigations.elts]
             if not isinstance(mitigations, str)
-            else [m],
+            else [mitigations],
             sourceFile=self._filename,
             sourceLine=node.lineno,
             contextHash=None,
         )
 
-    def visit(self, node):
+    def visit(self, node: ast.AST) -> None:
+        if not isinstance(node, ast.Call):
+            return
         if not self._is_exa_error(node):
             return
 
@@ -211,7 +227,7 @@ class ErrorCollector(ast.NodeVisitor):
         error_definiton = self._make_error(node)
         self._error_definitions.append(error_definiton)
 
-    def generic_visit(self, node):
+    def generic_visit(self, node: ast.AST):
         raise NotImplementedError()
 
 
@@ -224,34 +240,43 @@ class _JsonEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def parse_command(args) -> ExitCode:
-    """Parse errors out one or more python files and report them in the jsonl format."""
-    error_definitions = list()
-    warnings = list()
-    for f in args.python_file:
+from contextlib import ExitStack
+
+
+def _parse_file(
+    file: Union[str, Path, io.FileIO]
+) -> Tuple[List[ErrorCodeDetails], List[Validation.Warning], List[Validation.Error]]:
+    with ExitStack() as stack:
+        f = (
+            file
+            if isinstance(file, io.TextIOBase)
+            else stack.enter_context(open(file, "r"))
+        )
         collector = ErrorCollector(f.name)
         root_node = ast.parse(f.read())
+
         for n in ast.walk(root_node):
             collector.visit(n)
 
-        errors = collector.errors
+        return collector.error_definitions, collector.warnings, collector.errors
+
+
+def parse_command(args: argparse.Namespace) -> ExitCode:
+    """Parse errors out one or more python files and report them in the jsonl format."""
+    for f in args.python_file:
+        definitions, warnings, errors = _parse_file(f)
+        for d in definitions:
+            print(json.dumps(d, cls=_JsonEncoder))
+        for w in warnings:
+            print(w, file=sys.stderr)
         if errors:
             print("\n".join(str(e) for e in errors), file=sys.stderr)
             return ExitCode.FAILURE
 
-        error_definitions.extend(collector.error_definitions)
-        warnings.extend(collector.warnings)
-
-    for w in warnings:
-        print(w, file=sys.stderr)
-
-    for e in error_definitions:
-        print(json.dumps(e, cls=_JsonEncoder))
-
     return ExitCode.SUCCESS
 
 
-def generate_command(args) -> ExitCode:
+def generate_command(args: argparse.Namespace) -> ExitCode:
     """Generate an error code file for the specified workspace
 
 
@@ -271,35 +296,29 @@ def generate_command(args) -> ExitCode:
             "errorCodes": [e for e in errors],
         }
 
-    error_definitions = list()
-    warnings = list()
+    all_definitions = list()
+    all_warnings = list()
     paths = [Path(p) for p in args.root]
     files = {f for f in chain.from_iterable([root.glob("**/*.py") for root in paths])}
-    for file in files:
-        with open(file, "r") as f:
-            collector = ErrorCollector(f.name)
-            root_node = ast.parse(f.read())
-            for n in ast.walk(root_node):
-                collector.visit(n)
+    for f in files:
+        definitions, warnings, errors = _parse_file(f)
 
-            errors = collector.errors
-            if errors:
-                print("\n".join(str(e) for e in errors), file=sys.stderr)
-                return ExitCode.FAILURE
+        if errors:
+            print("\n".join(str(e) for e in errors), file=sys.stderr)
+            return ExitCode.FAILURE
 
-            error_definitions.extend(collector.error_definitions)
-            warnings.extend(collector.warnings)
+        all_definitions.extend(definitions)
+        all_warnings.extend(warnings)
 
-    for w in warnings:
+    for w in all_warnings:
         print(w, file=sys.stderr)
-
-    error_catalogue = _report(args.name, args.version, error_definitions)
+    error_catalogue = _report(args.name, args.version, all_definitions)
     print(json.dumps(error_catalogue, cls=_JsonEncoder))
 
     return ExitCode.SUCCESS
 
 
-def _create_parser():
+def _argument_parser():
     parser = argparse.ArgumentParser(
         prog="ec",
         description="Error Crawler",
@@ -353,6 +372,6 @@ def _create_parser():
 
 
 def main():
-    parser = _create_parser()
+    parser = _argument_parser()
     args = parser.parse_args()
     sys.exit(args.func(args))
