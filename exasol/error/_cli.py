@@ -3,11 +3,12 @@ import ast
 import io
 import json
 import sys
+from contextlib import ExitStack
 from dataclasses import asdict, dataclass, is_dataclass
 from enum import IntEnum
 from itertools import chain
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import Generator, List, Optional, Tuple, Union
 
 
 class ExitCode(IntEnum):
@@ -59,11 +60,32 @@ class Validation:
         line_number: Optional[int]
 
 
-class ErrorCollector(ast.NodeVisitor):
+class _ExaErrorNodeWalker:
+    @staticmethod
+    def _is_exa_error(node: ast.AST) -> bool:
+        if not isinstance(node, ast.Call):
+            return False
+        name = getattr(node.func, "id", "")
+        name = getattr(node.func, "attr", "") if name == "" else name
+        return name == "ExaError"
+
+    def __init__(self, root_node: ast.AST):
+        self._root = root_node
+
+    def __iter__(self) -> Generator[ast.Call, None, None]:
+        return (
+            node
+            for node in ast.walk(self._root)
+            if _ExaErrorNodeWalker._is_exa_error(node) and isinstance(node, ast.Call)
+        )
+
+
+class ErrorCollector:
     """ """
 
-    def __init__(self, filename: str = "<Unknown>"):
+    def __init__(self, root: ast.AST, filename: str = "<Unknown>"):
         self._filename = filename
+        self._root = root
         self._error_definitions: List[ErrorCodeDetails] = list()
         self._errors: List[Validation.Error] = list()
         self._warnings: List[Validation.Warning] = list()
@@ -100,6 +122,7 @@ class ErrorCollector(ast.NodeVisitor):
         # TODO: Add/Collect additional errors:
         #        * check for invalid error code format
         #
+        # Note: Consider factoring out the validator as extra class, similar to the _ExaErrorNodeWalker
         # see also, issue #<TBD>
 
         # make sure all parameters have the valid type
@@ -211,24 +234,17 @@ class ErrorCollector(ast.NodeVisitor):
             contextHash=None,
         )
 
-    def visit(self, node: ast.AST) -> None:
-        if not isinstance(node, ast.Call):
-            return
-        if not self._is_exa_error(node):
-            return
+    def collect(self) -> None:
+        for node in _ExaErrorNodeWalker(self._root):
+            errors, warnings = self.validate(node, self._filename)
+            if warnings:
+                self._warnings.extend(warnings)
+            if errors:
+                self._errors.extend(errors)
+                return
 
-        errors, warnings = self.validate(node, self._filename)
-        if warnings:
-            self._warnings.extend(warnings)
-        if errors:
-            self._errors.extend(errors)
-            return
-
-        error_definition = self._make_error(node)
-        self._error_definitions.append(error_definition)
-
-    def generic_visit(self, node: ast.AST):
-        raise NotImplementedError()
+            error_definition = self._make_error(node)
+            self._error_definitions.append(error_definition)
 
 
 class _JsonEncoder(json.JSONEncoder):
@@ -240,9 +256,6 @@ class _JsonEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-from contextlib import ExitStack
-
-
 def _parse_file(
     file: Union[str, Path, io.FileIO]
 ) -> Tuple[List[ErrorCodeDetails], List[Validation.Warning], List[Validation.Error]]:
@@ -252,11 +265,9 @@ def _parse_file(
             if isinstance(file, io.TextIOBase)
             else stack.enter_context(open(file, "r"))
         )
-        collector = ErrorCollector(f.name)
         root_node = ast.parse(f.read())
-
-        for n in ast.walk(root_node):
-            collector.visit(n)
+        collector = ErrorCollector(root_node, f.name)
+        collector.collect()
 
         return collector.error_definitions, collector.warnings, collector.errors
 
