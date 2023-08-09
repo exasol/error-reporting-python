@@ -8,7 +8,7 @@ from dataclasses import asdict, dataclass, is_dataclass
 from enum import IntEnum
 from itertools import chain
 from pathlib import Path
-from typing import Generator, List, Optional, Tuple, Union
+from typing import Generator, Iterable, List, Optional, Tuple, Union
 
 
 class ExitCode(IntEnum):
@@ -80,36 +80,22 @@ class _ExaErrorNodeWalker:
         )
 
 
-class ErrorCollector:
-    """ """
-
-    def __init__(self, root: ast.AST, filename: str = "<Unknown>"):
-        self._filename = filename
-        self._root = root
-        self._error_definitions: List[ErrorCodeDetails] = list()
-        self._errors: List[Validation.Error] = list()
+class _Validator:
+    def __init__(self):
         self._warnings: List[Validation.Warning] = list()
+        self._errors: List[Validation.Error] = list()
 
     @property
-    def error_definitions(self) -> List[ErrorCodeDetails]:
-        return self._error_definitions
-
-    @property
-    def errors(self) -> List[Validation.Error]:
+    def errors(self) -> Iterable[Validation.Error]:
         return self._errors
 
     @property
-    def warnings(self) -> List[Validation.Warning]:
+    def warnings(self) -> Iterable[Validation.Warning]:
         return self._warnings
 
-    @staticmethod
     def validate(
-        node: ast.Call, file: str
+        self, node: ast.Call, file: str
     ) -> Tuple[List[Validation.Error], List[Validation.Warning]]:
-        errors: List[Validation.Error]
-        warnings: List[Validation.Warning]
-        errors, warnings = list(), list()
-
         code: ast.Constant
         message: ast.Constant
         mitigations: Union[ast.Constant, ast.List]
@@ -122,13 +108,12 @@ class ErrorCollector:
         # TODO: Add/Collect additional errors:
         #        * check for invalid error code format
         #
-        # Note: Consider factoring out the validator as extra class, similar to the _ExaErrorNodeWalker
         # see also, issue #<TBD>
 
         # make sure all parameters have the valid type
         msg = "{type} only can contain constant values, details: {value}"
         if not isinstance(code, ast.Constant):
-            errors.append(
+            self._errors.append(
                 Validation.Error(
                     message=msg.format(type="error-codes", value=type(code)),
                     file=file,
@@ -136,7 +121,7 @@ class ErrorCollector:
                 )
             )
         if not isinstance(message, ast.Constant):
-            errors.append(
+            self._errors.append(
                 Validation.Error(
                     message=msg.format(type="message", value=type(message)),
                     file=file,
@@ -148,7 +133,7 @@ class ErrorCollector:
         if not isinstance(mitigations, ast.List) and not isinstance(
             mitigations, ast.Constant
         ):
-            errors.append(
+            self._errors.append(
                 Validation.Error(
                     message=msg.format(type="mitigations", value=type(mitigations)),
                     file=file,
@@ -158,7 +143,7 @@ class ErrorCollector:
 
         if isinstance(mitigations, ast.List):
             invalid = [e for e in mitigations.elts if not isinstance(e, ast.Constant)]
-            errors.extend(
+            self._errors.extend(
                 [
                     Validation.Error(
                         message=msg.format(type="mitigations", value=type(e)),
@@ -171,7 +156,7 @@ class ErrorCollector:
         # Validate parameters
         for key in parameters.keys:
             if not isinstance(key, ast.Constant):
-                errors.append(
+                self._errors.append(
                     Validation.Error(
                         message=msg.format(type="key", value=type(key)),
                         file=file,
@@ -182,7 +167,7 @@ class ErrorCollector:
             if isinstance(value, ast.Call):
                 description = value.args[1]
                 if not isinstance(description, ast.Constant):
-                    errors.append(
+                    self._errors.append(
                         Validation.Error(
                             message=msg.format(
                                 type="description", value=type(description)
@@ -192,15 +177,29 @@ class ErrorCollector:
                         )
                     )
 
-        return errors, warnings
+        return self._errors, self._warnings
 
-    @staticmethod
-    def _is_exa_error(node: ast.AST) -> bool:
-        if not isinstance(node, ast.Call):
-            return False
-        name = getattr(node.func, "id", "")
-        name = getattr(node.func, "attr", "") if name == "" else name
-        return name == "ExaError"
+
+class ErrorCollector:
+    """ """
+
+    def __init__(self, root: ast.AST, filename: str = "<Unknown>"):
+        self._filename = filename
+        self._root = root
+        self._validator = _Validator()
+        self._error_definitions: List[ErrorCodeDetails] = list()
+
+    @property
+    def error_definitions(self) -> List[ErrorCodeDetails]:
+        return self._error_definitions
+
+    @property
+    def errors(self) -> Iterable[Validation.Error]:
+        return self._validator.errors
+
+    @property
+    def warnings(self) -> Iterable[Validation.Warning]:
+        return self._validator.warnings
 
     def _make_error(self, node: ast.Call) -> ErrorCodeDetails:
         code: ast.Constant
@@ -236,13 +235,10 @@ class ErrorCollector:
 
     def collect(self) -> None:
         for node in _ExaErrorNodeWalker(self._root):
-            errors, warnings = self.validate(node, self._filename)
-            if warnings:
-                self._warnings.extend(warnings)
+            errors, warnings = self._validator.validate(node, self._filename)
             if errors:
-                self._errors.extend(errors)
+                # stop if we encountered any error
                 return
-
             error_definition = self._make_error(node)
             self._error_definitions.append(error_definition)
 
@@ -258,7 +254,9 @@ class _JsonEncoder(json.JSONEncoder):
 
 def _parse_file(
     file: Union[str, Path, io.FileIO]
-) -> Tuple[List[ErrorCodeDetails], List[Validation.Warning], List[Validation.Error]]:
+) -> Tuple[
+    Iterable[ErrorCodeDetails], Iterable[Validation.Warning], Iterable[Validation.Error]
+]:
     with ExitStack() as stack:
         f = (
             file
