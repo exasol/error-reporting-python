@@ -4,9 +4,9 @@ from inspect import cleandoc
 
 import pytest
 
-from exasol.error._cli import ErrorCodeDetails, ErrorCollector, Placeholder, Validation
+from exasol.error._parse import ErrorCodeDetails, ErrorCollector, Placeholder, Validator
 
-AST_NAME_CLASS = "ast.NAME" if sys.version_info.minor > 8 else "_ast.Name"
+AST_NAME_CLASS = "ast.Name" if sys.version_info.minor > 8 else "_ast.Name"
 
 
 @pytest.mark.parametrize(
@@ -71,7 +71,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validation.Error(
+                Validator.Error(
                     message=f"description only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=10,
@@ -95,7 +95,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validation.Error(
+                Validator.Error(
                     message=f"error-codes only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=7,
@@ -119,7 +119,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validation.Error(
+                Validator.Error(
                     message=f"mitigations only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=9,
@@ -143,7 +143,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validation.Error(
+                Validator.Error(
                     message=f"mitigations only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
                     file="<Unknown>",
                     line_number=9,
