@@ -84,6 +84,7 @@ class _Validator:
     def __init__(self):
         self._warnings: List[Validation.Warning] = list()
         self._errors: List[Validation.Error] = list()
+        self._error_msg = "{type} only can contain constant values, details: {value}"
 
     @property
     def errors(self) -> Iterable[Validation.Error]:
@@ -111,73 +112,86 @@ class _Validator:
         # see also, issue #<TBD>
 
         # make sure all parameters have the valid type
-        msg = "{type} only can contain constant values, details: {value}"
+        self._validate_code(code, file)
+        self._validate_message(message, file)
+        self._validate_mitigations(mitigations, file)
+        self._validate_parameters(parameters, file)
+
+        return self._errors, self._warnings
+
+    def _validate_code(self, code: ast.Constant, file: str):
         if not isinstance(code, ast.Constant):
             self._errors.append(
                 Validation.Error(
-                    message=msg.format(type="error-codes", value=type(code)),
+                    message=self._error_msg.format(
+                        type="error-codes", value=type(code)
+                    ),
                     file=file,
                     line_number=code.lineno,
                 )
             )
-        if not isinstance(message, ast.Constant):
+
+    def _validate_message(self, node: ast.Constant, file: str):
+        if not isinstance(node, ast.Constant):
             self._errors.append(
                 Validation.Error(
-                    message=msg.format(type="message", value=type(message)),
+                    message=self._error_msg.format(type="message", value=type(node)),
                     file=file,
-                    line_number=message.lineno,
+                    line_number=node.lineno,
                 )
             )
 
-        # Validate that everything except parameters are constants
-        if not isinstance(mitigations, ast.List) and not isinstance(
-            mitigations, ast.Constant
-        ):
+    def _validate_mitigations(self, node: Union[ast.Constant, ast.List], file: str):
+        if not isinstance(node, ast.List) and not isinstance(node, ast.Constant):
             self._errors.append(
                 Validation.Error(
-                    message=msg.format(type="mitigations", value=type(mitigations)),
+                    message=self._error_msg.format(
+                        type="mitigations", value=type(node)
+                    ),
                     file=file,
-                    line_number=mitigations.lineno,
+                    line_number=node.lineno,
                 )
             )
 
-        if isinstance(mitigations, ast.List):
-            invalid = [e for e in mitigations.elts if not isinstance(e, ast.Constant)]
+        if isinstance(node, ast.List):
+            invalid = [e for e in node.elts if not isinstance(e, ast.Constant)]
             self._errors.extend(
                 [
                     Validation.Error(
-                        message=msg.format(type="mitigations", value=type(e)),
+                        message=self._error_msg.format(
+                            type="mitigations", value=type(e)
+                        ),
                         file=file,
                         line_number=e.lineno,
                     )
                     for e in invalid
                 ]
             )
+
+    def _validate_parameters(self, node: ast.Dict, file: str):
         # Validate parameters
-        for key in parameters.keys:
+        for key in node.keys:
             if not isinstance(key, ast.Constant):
                 self._errors.append(
                     Validation.Error(
-                        message=msg.format(type="key", value=type(key)),
+                        message=self._error_msg.format(type="key", value=type(key)),
                         file=file,
                         line_number=key.lineno,
                     )
                 )
-        for value in parameters.values:
+        for value in node.values:
             if isinstance(value, ast.Call):
                 description = value.args[1]
                 if not isinstance(description, ast.Constant):
                     self._errors.append(
                         Validation.Error(
-                            message=msg.format(
+                            message=self._error_msg.format(
                                 type="description", value=type(description)
                             ),
                             file=file,
                             line_number=value.lineno,
                         )
                     )
-
-        return self._errors, self._warnings
 
 
 class ErrorCollector:

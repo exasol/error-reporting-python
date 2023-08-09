@@ -12,15 +12,15 @@ from exasol.error._cli import ErrorCodeDetails, ErrorCollector, Placeholder, Val
         (
             cleandoc(
                 """
-                    from exasol import error
-                    
-                    error1 = error.ExaError(
-                        "E-TEST-1",
-                        "this is an error",
-                        ["no mitigation available"],
-                        {"param": error.Parameter("value", "description")},
-                    )
-                    """
+                        from exasol import error
+                        
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            ["no mitigation available"],
+                            {"param": error.Parameter("value", "description")},
+                        )
+                        """
             ),
             [
                 ErrorCodeDetails(
@@ -43,11 +43,8 @@ from exasol.error._cli import ErrorCodeDetails, ErrorCollector, Placeholder, Val
 )
 def test_ErrorCollector_error_definitions(src, expected):
     root_node = ast.parse(src)
-    collector = ErrorCollector()
-
-    for n in ast.walk(root_node):
-        collector.visit(n)
-
+    collector = ErrorCollector(root_node)
+    collector.collect()
     assert expected == collector.error_definitions
 
 
@@ -57,18 +54,18 @@ def test_ErrorCollector_error_definitions(src, expected):
         (
             cleandoc(
                 """
-                    from exasol import error
-                    from exasol.error import Parameter
-    
-                    var = input("description: ") 
-    
-                    error1 = error.ExaError(
-                        "E-TEST-1",
-                        "this is an error",
-                        ["no mitigation available"],
-                        {"param": Parameter("value", var)},
-                    )
-                    """
+                        from exasol import error
+                        from exasol.error import Parameter
+        
+                        var = input("description: ") 
+        
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            ["no mitigation available"],
+                            {"param": Parameter("value", var)},
+                        )
+                        """
             ),
             [
                 Validation.Error(
@@ -81,18 +78,18 @@ def test_ErrorCollector_error_definitions(src, expected):
         (
             cleandoc(
                 """
-                    from exasol import error
-                    from exasol.error import Parameter
-    
-                    var = input("description: ") 
-    
-                    error1 = error.ExaError(
-                        var,
-                        "this is an error",
-                        ["no mitigation available"],
-                        {"param": Parameter("value", "description")},
-                    )
-                    """
+                        from exasol import error
+                        from exasol.error import Parameter
+        
+                        var = input("description: ") 
+        
+                        error1 = error.ExaError(
+                            var,
+                            "this is an error",
+                            ["no mitigation available"],
+                            {"param": Parameter("value", "description")},
+                        )
+                        """
             ),
             [
                 Validation.Error(
@@ -105,18 +102,18 @@ def test_ErrorCollector_error_definitions(src, expected):
         (
             cleandoc(
                 """
-                    from exasol import error
-                    from exasol.error import Parameter
-    
-                    var = input("description: ") 
-    
-                    error1 = error.ExaError(
-                        "E-TEST-1",
-                        "this is an error",
-                        [var],
-                        {"param": Parameter("value", "description")},
-                    )
-                    """
+                        from exasol import error
+                        from exasol.error import Parameter
+        
+                        var = input("description: ") 
+        
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            [var],
+                            {"param": Parameter("value", "description")},
+                        )
+                        """
             ),
             [
                 Validation.Error(
@@ -129,18 +126,18 @@ def test_ErrorCollector_error_definitions(src, expected):
         (
             cleandoc(
                 """
-                    from exasol import error
-                    from exasol.error import Parameter
-    
-                    var = input("description: ") 
-    
-                    error1 = error.ExaError(
-                        "E-TEST-1",
-                        "this is an error",
-                        var,
-                        {"param": Parameter("value", "description")},
-                    )
-                    """
+                        from exasol import error
+                        from exasol.error import Parameter
+        
+                        var = input("description: ") 
+        
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            var,
+                            {"param": Parameter("value", "description")},
+                        )
+                        """
             ),
             [
                 Validation.Error(
@@ -154,11 +151,8 @@ def test_ErrorCollector_error_definitions(src, expected):
 )
 def test_ErrorCollector_errors(src, expected):
     root_node = ast.parse(src)
-    collector = ErrorCollector()
-
-    for n in ast.walk(root_node):
-        collector.visit(n)
-
+    collector = ErrorCollector(root_node)
+    collector.collect()
     assert expected == collector.errors
 
 
@@ -168,18 +162,18 @@ def test_ErrorCollector_errors(src, expected):
         (
             cleandoc(
                 """
-                    from exasol import error
-                    from exasol.error import Parameter
-    
-                    var = input("description: ") 
-    
-                    error1 = error.ExaError(
-                        "E-TEST-1",
-                        "this is an error",
-                        ["no mitigation available"],
-                        {"param": Parameter("value", var)},
-                    )
-                    """
+                        from exasol import error
+                        from exasol.error import Parameter
+        
+                        var = input("description: ") 
+        
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            ["no mitigation available"],
+                            {"param": Parameter("value", var)},
+                        )
+                        """
             ),
             [],
         ),
@@ -187,9 +181,6 @@ def test_ErrorCollector_errors(src, expected):
 )
 def test_ErrorCollector_warnings(src, expected):
     root_node = ast.parse(src)
-    collector = ErrorCollector()
-
-    for n in ast.walk(root_node):
-        collector.visit(n)
-
+    collector = ErrorCollector(root_node)
+    collector.collect()
     assert expected == collector.warnings

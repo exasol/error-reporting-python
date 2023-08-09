@@ -18,7 +18,7 @@ Prepare Test
 
 Test module entry point
 
-  $ python -m exasol.error generate modulename 1.2.0 . | python -m json.tool --json-lines
+  $ python -m exasol.error --debug generate modulename 1.2.0 . | python -m json.tool --json-lines
   {
       "$schema": "https://schemas.exasol.com/error_code_report-1.0.0.json",
       "projectName": "modulename",
@@ -67,7 +67,7 @@ Test module entry point
 
 Test cli command
 
-  $ ec generate modulename 1.2.0 . | python -m json.tool --json-lines
+  $ ec --debug generate modulename 1.2.0 . | python -m json.tool --json-lines
   {
       "$schema": "https://schemas.exasol.com/error_code_report-1.0.0.json",
       "projectName": "modulename",

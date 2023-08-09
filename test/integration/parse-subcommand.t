@@ -18,7 +18,7 @@ Prepare Test
 
 Test module entry point
 
-  $ python -m exasol.error parse pymodule.py | python -m json.tool --json-lines
+  $ python -m exasol.error --debug parse pymodule.py | python -m json.tool --json-lines
   {
       "identifier": "E-TEST-1",
       "message": "this is an error",
@@ -60,7 +60,7 @@ Test module entry point
 
 Test cli command
 
-  $ ec parse pymodule.py | python -m json.tool --json-lines
+  $ ec --debug parse pymodule.py | python -m json.tool --json-lines
   {
       "identifier": "E-TEST-1",
       "message": "this is an error",
