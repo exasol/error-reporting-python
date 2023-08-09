@@ -24,7 +24,12 @@ jobs:
           poetry-version: 1.4.0
       - name: Poetry install
         run: poetry install
+
       - name: Poetry build
         run: poetry build
-      - name: Poetry run tests
+
+      - name: Run tests for old API
         run: poetry run pytest tests
+
+      - name: Run tests for new API and parser
+        run: poetry run pytest test

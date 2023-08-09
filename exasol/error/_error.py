@@ -1,7 +1,6 @@
 import warnings
-from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Dict, Iterable, List, Mapping, Union
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -78,6 +77,7 @@ def ExaError(
             FIXME: Due to legacy reasons this function currently still may raise an `ValueError` (Refactoring Required).
 
             Potential error scenarios which should taken into account are the following ones:
+
              * E-ERP-1: Invalid error code provided
                     params:
                         * Original ErrorCode
