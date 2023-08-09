@@ -109,7 +109,7 @@ class _Validator:
         # TODO: Add/Collect additional errors:
         #        * check for invalid error code format
         #
-        # see also, issue #<TBD>
+        # See also [Github Issue #23](https://github.com/exasol/error-reporting-python/issues/23)
 
         # make sure all parameters have the valid type
         self._validate_code(code, file)
@@ -195,8 +195,6 @@ class _Validator:
 
 
 class ErrorCollector:
-    """ """
-
     def __init__(self, root: ast.AST, filename: str = "<Unknown>"):
         self._filename = filename
         self._root = root
@@ -302,13 +300,12 @@ def parse_command(args: argparse.Namespace) -> ExitCode:
 def generate_command(args: argparse.Namespace) -> ExitCode:
     """Generate an error code file for the specified workspace
 
-
-    Improvements, future TODO's (see issue#<to be created>):
-
-        Add support for:
+    TODO: Improve command by reflecting information from pyproject.toml file
         * Derive python files from pyproject.toml package definition
         * Derive name form pyproject.toml
         * Derive version from pyproject.toml
+
+        see also [Github Issue #24](https://github.com/exasol/error-reporting-python/issues/24)
     """
 
     def _report(project_name, project_version, errors):
