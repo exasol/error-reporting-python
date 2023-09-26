@@ -9,12 +9,13 @@
 
 ## Test Dependencies
 
-| Dependency                    | Purpose                           | License           |
-|-------------------------------|-----------------------------------|-------------------|
-| [Pytest][pytest]              | Testing framework                 | MIT               |
+| Dependency       | Purpose                           | License |
+|------------------|-----------------------------------|---------|
+| [Pytest][pytest] | Testing framework                 | MIT     |
+| [Prysk][prysk]   | Testing framework                 | GPL     |
 
 
 
 [python]: https://docs.python.org
-
 [pytest]: https://docs.pytest.org/en/stable/
+[prysk]: https://www.prysk.net

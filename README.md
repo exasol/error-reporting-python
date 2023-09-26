@@ -1,4 +1,4 @@
-# Error Reporting Python
+# Exasol Error Reporting
 
 This project contains a python library for describing Exasol error messages.
 This library lets you define errors with a uniform set of attributes.
@@ -7,35 +7,68 @@ so that you can extract an error catalog from the code.
 
 ## In a Nutshell
 
-Create an error object:
+### Install the library
+
+```shell
+pip install exasol-error-reporting
+```
+
+### Create a Simple Error
 
 ```python
-exa_error_obj = ExaError.message_builder('E-TEST-1')
-    .message("Not enough space on device {{device}}.")
-    .mitigation("Delete something from {{device}}.")
-    .mitigation("Create larger partition.")
-    .parameter("device", "/dev/sda1", "name of the device") 
+from exasol import error
+
+error1 = error.ExaError(
+    "E-TEST-1", "A trivial error", "No mitigation available", {}
+)
 ```
 
-Use it as string:
+### Specify Multiple Mitigations
+```python
+from exasol import error
+
+error2 = error.ExaError(
+    "E-TEST-2",
+    "Fire in the server room",
+    [
+        "Use the fire extinguisher",
+        "flood the room with halon gas (Attention: be sure no humans in the room!)"
+    ],
+    {}
+)
+```
+
+### Error Parameter(s) without description
 
 ```python
-print(exa_error_obj)
-```
+from exasol import error
 
-Result:
-
+error3 = error.ExaError(
+    "E-TEST-2",
+    "Not enough space on device {{device}}.",
+    "Delete something from {{device}}.",
+    {"device": "/dev/sda1"},
+)
 ```
-E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
-* Delete something from '/dev/sda1'.
-* Create larger partition.
+### Error with detailed Parameter(s) 
+
+```python
+from exasol import error
+from exasol.error import Parameter
+
+error4 = error.ExaError(
+    "E-TEST-2",
+    "Not enough space on device {{device}}.",
+    "Delete something from {{device}}.",
+    {"device": Parameter("/dev/sda1", "name of the device")},
+)
 ```
 
 Check out the [user guide](doc/user_guide/user_guide.md) for more details.
 
 ## Tooling
 
-The `error-reporting-python` library comes with a command line tool (`ec`) which also can be invoked
+The `exasol-error-reporting` library comes with a command line tool (`ec`) which also can be invoked
 by using its package/module entry point (`python -m exasol.error`).
 For detailed information about the usage consider consulting the help `ec --help` or `python -m exasol.error --help`.
 
@@ -57,6 +90,12 @@ you can use the generate subcommand.
 ```shell
 ec generate NAME VERSION PACKAGE_ROOT > error-codes.json
 ```
+
+## Known Issues
+
+* [Thows exception on invalid error code format](https://github.com/exasol/error-reporting-python/issues/27)
+* [Single mitigations only can be passed within a list](https://github.com/exasol/error-reporting-python/issues/26)
+* [Named parameters do not work for error construction](https://github.com/exasol/error-reporting-python/issues/25)
 
 ### Information for Users
 

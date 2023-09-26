@@ -1,15 +1,23 @@
-# error-reporting-python 0.4.0, released T.B.D
+# exasol-error-reporting 0.4.0, released 2023-09-26 
 
-Code Name: T.B.D
+Code Name: API Rework and package renaming 
 
 ## Summary
 
-T.B.D
+Reworked the API to be more pythonic and easier to parse. Also the package have
+been renamed in order to fit the pypi naming scheme.
 
-## Feature
+### Feature
   - #4: Add error parser/crawler cli tool
 
 ### Refactoring
 
+  - Renamed python package from `exasol-error-reporting-python` to  `exasol-error-reporting`.
   - #19: Rework error reporting API
   - #17: Removed setup.py and updated poetry in actions
+
+### Documentation
+
+  - #22: Update documentation
+  - #16: Add note on pypi to README
+
