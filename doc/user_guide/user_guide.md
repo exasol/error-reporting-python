@@ -38,5 +38,5 @@ This parameter provides a list of hints on how to fix the error.
 Parameters of placeholders in the mitigations can be given via the `parameters` parameter.
  
 #### parameters
-This parameter takes a dictionary of placeholder names and the respective parameter values.
+This argument takes a dictionary of placeholder names and the respective parameter values.
 They will be used to replace the placeholders in the mitigations and messages.
