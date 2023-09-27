@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "exasol-error-reporting-python"
+name = "exasol-error-reporting"
 packages  = [
     {include = "exasol"},
     {include = "exasol_error_reporting_python"}

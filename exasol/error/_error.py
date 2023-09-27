@@ -16,7 +16,7 @@ class Parameter:
 class Error:
     def __init__(
         self,
-        name: str,
+        code: str,
         message: str,
         mitigations: Union[str, Iterable[str]],
         parameters: Dict[str, Union[str, Parameter]],
@@ -38,26 +38,27 @@ class Error:
 
             return builder
 
-        self._error = build_error(name, message, mitigations, parameters)
+        self._error = build_error(code, message, mitigations, parameters)
 
     def __str__(self) -> str:
         return f"{self._error}"
 
     # TODO: Implement __format__ to conveniently support long and short reporting format
+    # See also see, Github Issue #28 https://github.com/exasol/error-reporting-python/issues/28
 
 
 def ExaError(
-    name: str,
+    code: str,
     message: str,
     mitigations: Union[str, List[str]],
     parameters: Mapping[str, Union[str, Parameter]],
 ) -> Error:
     """Create a new ExaError.
 
-    The caller is responsible to make sure that the chosen name/id is unique.
+    The caller is responsible to make sure that the chosen code/id is unique.
 
     Args:
-        name: unique name/id of the error.
+        code: unique name/id of the error.
         message: the error message itself. It can contain placeholders for parameters.
         mitigations: One or multiple mitigations strings. A mitigation can contain placeholders for parameters.
         parameters: which will be used for substitute the parameters in the mitigation(s) and the error message.
@@ -91,5 +92,7 @@ def ExaError(
                         * Original error message
                         * Original mitigations
                         * Original parameters
+
+            see also [Github Issue #27](https://github.com/exasol/error-reporting-python/issues/27)
     """
-    return Error(name, message, mitigations, parameters)
+    return Error(code, message, mitigations, parameters)
