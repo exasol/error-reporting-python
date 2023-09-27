@@ -1,4 +1,4 @@
-# exasol-error-reporting 0.4.0, released 2023-09-26 
+# exasol-error-reporting 0.4.0, released 2023-09-27 
 
 Code Name: API Rework and package renaming 
 
