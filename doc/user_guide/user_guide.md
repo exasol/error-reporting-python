@@ -7,8 +7,8 @@ so that you can extract an error catalog from the code.
 
 ## Creating an Error Object
 
-Error objects are built in using the fuction `ExaError`. 
-Please keep in mind that error-code should satisfy error-code format (see [code](#code)).
+Error objects are built using the function `ExaError`. 
+Please keep in mind that error-code should satisfy the error-code format (see [code](#code)).
 
 Flexibility is provided by introducing placeholder parameters to the error 
 message.
