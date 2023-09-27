@@ -93,7 +93,7 @@ ec generate NAME VERSION PACKAGE_ROOT > error-codes.json
 
 ## Known Issues
 
-* [Thows exception on invalid error code format](https://github.com/exasol/error-reporting-python/issues/27)
+* [Throws exception on invalid error code format](https://github.com/exasol/error-reporting-python/issues/27)
 * [Single mitigations only can be passed within a list](https://github.com/exasol/error-reporting-python/issues/26)
 * [Named parameters do not work for error construction](https://github.com/exasol/error-reporting-python/issues/25)
 
