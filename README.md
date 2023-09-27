@@ -1,6 +1,6 @@
 # Exasol Error Reporting
 
-This project contains a python library for describing Exasol error messages.
+This project contains a Python library for describing Exasol error messages.
 This library lets you define errors with a uniform set of attributes.
 Furthermore, the error message is implemented to be parseable,
 so that you can extract an error catalog from the code.
