@@ -4,7 +4,7 @@ Code Name: API Rework and package renaming
 
 ## Summary
 
-Reworked the API to be more pythonic and easier to parse. Also the package have
+Reworked the API to be more pythonic and easier to parse. Also the package has
 been renamed in order to fit the pypi naming scheme.
 
 ### Feature
