@@ -37,3 +37,41 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 ec = 'exasol.error._cli:main'
+
+
+[tool.coverage.run]
+relative_files = true
+source = [
+    "exasol",
+]
+
+[tool.coverage.report]
+fail_under = 65
+
+
+[tool.black]
+line-length = 88
+verbose = false
+include = "\\.pyi?$"
+
+
+[tool.isort]
+profile = "black"
+force_grid_wrap = 2
+
+
+[tool.pylint.master]
+fail-under = 7.2
+
+[tool.pylint.format]
+max-line-length = 88
+max-module-lines = 800
+
+
+[[tool.mypy.overrides]]
+module = [
+    "exasol.toolbox.sphinx.multiversion.*",
+    "test.unit.*",
+    "test.integration.*",
+]
+ignore_errors = true
