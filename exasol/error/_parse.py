@@ -229,7 +229,8 @@ def parse_file(
             else stack.enter_context(open(file, "r"))
         )
         root_node = ast.parse(f.read())
-        collector = ErrorCollector(root_node, f.name)
+        name = f.name if hasattr(f, 'name') else f'<{f.__class__.__name__}>'
+        collector = ErrorCollector(root_node, name)
         collector.collect()
 
         return collector.error_definitions, collector.warnings, collector.errors
