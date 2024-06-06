@@ -28,6 +28,20 @@ class _ExaErrorNodeWalker:
         )
 
 
+def _extract_parameters(node: ast.Call):
+    kwargs = {}
+    params = ["code", "message", "mitigations", "parameters"]
+
+    for arg in node.args:
+        name = params.pop(0)
+        kwargs[name] = arg
+
+    for keyword_argument in node.keywords:
+        kwargs[keyword_argument.arg] = keyword_argument.value
+
+    return kwargs["code"], kwargs["message"], kwargs["mitigations"], kwargs["parameters"]
+
+
 class Validator:
     @dataclass(frozen=True)
     class Error:
@@ -55,13 +69,14 @@ class Validator:
         return self._warnings
 
     def validate(
-        self, node: ast.Call, file: str
+            self, node: ast.Call, file: str
     ) -> Tuple[List["Validator.Error"], List["Validator.Warning"]]:
         code: ast.Constant
         message: ast.Constant
         mitigations: Union[ast.Constant, ast.List]
         parameters: ast.Dict
-        code, message, mitigations, parameters = node.args
+
+        code, message, mitigations, parameters = _extract_parameters(node)
 
         # TODO: Add/Collect additional warnings:
         #        * error message/mitigation defines a placeholder, but no parameter is provided
@@ -95,7 +110,8 @@ class Validator:
         if not isinstance(node, ast.Constant):
             self._errors.append(
                 self.Error(
-                    message=self._error_msg.format(type="message", value=type(node)),
+                    message=self._error_msg.format(
+                        type="message", value=type(node)),
                     file=file,
                     line_number=node.lineno,
                 )
@@ -134,7 +150,8 @@ class Validator:
             if not isinstance(key, ast.Constant):
                 self._errors.append(
                     self.Error(
-                        message=self._error_msg.format(type="key", value=type(key)),
+                        message=self._error_msg.format(
+                            type="key", value=type(key)),
                         file=file,
                         line_number=key.lineno,
                     )
@@ -178,7 +195,7 @@ class ErrorCollector:
         message: ast.Constant
         mitigations: Union[ast.List, ast.Constant]
         parameters: ast.Dict
-        code, message, mitigations, parameters = node.args
+        code, message, mitigations, parameters = _extract_parameters(node)
 
         def normalize(params):
             for k, v in zip(params.keys, params.keys):
@@ -220,7 +237,7 @@ class ErrorCollector:
 
 
 def parse_file(
-    file: Union[str, Path, io.FileIO]
+        file: Union[str, Path, io.FileIO]
 ) -> Tuple[
     Iterable[ErrorCodeDetails],
     Iterable["Validator.Warning"],
