@@ -13,7 +13,7 @@ Please keep in mind that error-code should satisfy the error-code format (see [c
 Flexibility is provided by introducing placeholder parameters to the error 
 message.
 
-#### code
+### code
 This parameter needs to obey the following format (`^[FEW]-[[A-Z][A-Z0-9]+(-[A-Z][A-Z0-9]+)*-[0-9]+$`):
 
 `severity "-" project-short-tag ["-" module-short-tag] "-" error-number` where,
@@ -28,15 +28,15 @@ Examples of valide error codes:
 - E-EXA-SQL-22004
 - F-VS-QRW-13
 
-#### message
+### message
 This parameter includes the error description which can be given by either a static
 string or a string containing placeholders in double curly brackets. Parameters 
 of placeholders in the error message can be provided using the `parameters` parameter.
 
-#### mitigations
+### mitigations
 This parameter provides a list of hints on how to fix the error. 
 Parameters of placeholders in the mitigations can be given via the `parameters` parameter.
  
-#### parameters
+### parameters
 This argument takes a dictionary of placeholder names and the respective parameter values.
 They will be used to replace the placeholders in the mitigations and messages.
