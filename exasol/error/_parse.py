@@ -197,7 +197,11 @@ class ErrorCollector:
             description=None,
             internalDescription=None,
             potentialCauses=None,
-            mitigations=[m.value for m in mitigations.elts]
+            mitigations=(
+                [m.value for m in mitigations.elts]
+                if isinstance(mitigations, ast.List)
+                else [mitigations.value]
+            )
             if not isinstance(mitigations, str)
             else [mitigations],
             sourceFile=self._filename,
