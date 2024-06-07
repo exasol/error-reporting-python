@@ -1,11 +1,4 @@
-# exasol-error-reporting X.Y.Z, released YYYY-MM-DD
+# Unreleased
 
-Code Name: 
-
-## Summary
-
-### Security
-### Bugfix
 ### Feature
-### Refactoring
-### Documentation
+  - #25: Add support for named parameters.
