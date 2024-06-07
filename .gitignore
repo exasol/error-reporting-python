@@ -136,3 +136,7 @@ poetry.lock
 
 # Sphinx
 doc/_build
+.html-documentation
+
+.lint.json
+.lint.txt

@@ -1,0 +1,14 @@
+name: PR-Merge
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+
+jobs:
+
+  publish-docs:
+    name: Publish Documentation
+    uses: ./.github/workflows/gh-pages.yml
+
