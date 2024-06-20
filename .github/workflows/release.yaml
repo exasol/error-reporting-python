@@ -14,10 +14,10 @@ jobs:
     steps:
 
       - name: SCM Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python & Poetry Environment
-        uses: ./.github/actions/prepare_poetry_env
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.13.0
 
       - name: Build Artifacts
         run: poetry build
@@ -35,4 +35,3 @@ jobs:
           gh release create ${GITHUB_REF_NAME}
           --title ${GITHUB_REF_NAME} -F "./doc/changes/changes_${GITHUB_REF_NAME}.md"
           dist/*
-
