@@ -1,29 +1,28 @@
-name: Run pytest tests
+name: CI
 
 on: [ push ]
 
 jobs:
-  integration_tests:
+  ci-job:
+    name: Integration tests (Python-${{ matrix.python-version }})
     strategy:
       fail-fast: false
       matrix:
         python-version:
-          - "3.8"
-          - "3.9"
           - "3.10"
+          - "3.11"
+          - "3.12"
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+
+      - name: Setup Python & Poetry Environment
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.13.0
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: 1.4.0
-      - name: Poetry install
-        run: poetry install
+          poetry-version: '1.8.2'
 
       - name: Poetry build
         run: poetry build
@@ -33,3 +32,11 @@ jobs:
 
       - name: Run tests for new API and parser
         run: poetry run pytest test
+
+  gate-1:
+    name: Gate 1 - Regular CI
+    needs: [ ci-job ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Branch Protection
+        run: true
