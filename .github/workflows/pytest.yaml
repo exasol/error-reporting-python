@@ -1,9 +1,10 @@
-name: Run pytest tests
+name: CI
 
 on: [ push ]
 
 jobs:
-  integration-tests:
+  ci-job:
+    name: Integration tests
     strategy:
       fail-fast: false
       matrix:
@@ -31,10 +32,10 @@ jobs:
       - name: Run tests for new API and parser
         run: poetry run pytest test
 
-  gate-2:
-    name: Gate 2 - Allow Merge
+  gate-1:
+    name: Gate 1 - Regular CI
+    needs: [ ci-job ]
     runs-on: ubuntu-latest
-    needs: [ integration-tests ]
     steps:
       - name: Branch Protection
         run: true
