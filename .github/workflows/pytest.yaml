@@ -4,7 +4,7 @@ on: [ push ]
 
 jobs:
   ci-job:
-    name: Integration tests
+    name: Integration tests (Python-$${{ matrix.python-version }})
     strategy:
       fail-fast: false
       matrix:
