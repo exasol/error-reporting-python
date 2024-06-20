@@ -3,7 +3,7 @@ name: Run pytest tests
 on: [ push ]
 
 jobs:
-  integration_tests:
+  integration-tests:
     strategy:
       fail-fast: false
       matrix:
@@ -30,3 +30,11 @@ jobs:
 
       - name: Run tests for new API and parser
         run: poetry run pytest test
+
+  gate-2:
+    name: Gate 2 - Allow Merge
+    runs-on: ubuntu-latest
+    needs: [ integration-tests ]
+    steps:
+      - name: Branch Protection
+        run: true
