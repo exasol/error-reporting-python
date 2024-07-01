@@ -24,10 +24,10 @@ keywords = ['exasol', 'python', 'error-reporting']
 
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.1.2"
+pytest = ">=7.1.2,<9"
 prysk = {extras = ["pytest-plugin"], version = ">=0.15.1"}
 exasol-toolbox = ">=0.13.0"
 
