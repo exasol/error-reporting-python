@@ -32,7 +32,7 @@ error2 = error.ExaError(
     message="Fire in the server room",
     mitigations=[
         "Use the fire extinguisher",
-        "Flood the room with halon gas (Attention: be sure no humans in the room!)"
+        "Flood the room with halon gas (Attention: make sure no humans are in the room!)"
     ],
     parameters={}
 )
