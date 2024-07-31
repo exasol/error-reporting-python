@@ -1,6 +1,10 @@
 # Unreleased
 
-### Feature
+
+## Internal
+* Relock Dependencies
+
+## Feature
 
 * #25: Add support for named parameters.
 
