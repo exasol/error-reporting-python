@@ -29,12 +29,12 @@ from exasol import error
 
 error2 = error.ExaError(
     "E-TEST-2",
-    "Fire in the server room",
-    [
+    message="Fire in the server room",
+    mitigations=[
         "Use the fire extinguisher",
-        "Flood the room with halon gas (Attention: be sure no humans in the room!)"
+        "Flood the room with halon gas (Attention: make sure no humans are in the room!)"
     ],
-    {}
+    parameters={}
 )
 ```
 
@@ -92,10 +92,7 @@ ec generate NAME VERSION PACKAGE_ROOT > error-codes.json
 ```
 
 ## Known Issues
-
 * [Throws exception on invalid error code format](https://github.com/exasol/error-reporting-python/issues/27)
-* [Single mitigations only can be passed within a list](https://github.com/exasol/error-reporting-python/issues/26)
-* [Named parameters do not work for error construction](https://github.com/exasol/error-reporting-python/issues/25)
 
 ### Information for Users
 
