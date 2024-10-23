@@ -1,5 +1,6 @@
 import re
 from typing import Any
+
 from exasol_error_reporting_python.parameters_mapper import ParametersMapper
 from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
 

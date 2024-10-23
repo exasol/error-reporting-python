@@ -75,4 +75,3 @@ html_theme_options = {
     "github_url": "https://github.com/exasol/error-reporting-python",
     "accent_color": "grass",
 }
-

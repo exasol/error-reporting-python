@@ -1,4 +1,5 @@
 """Configuration for nox based task runner"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -14,9 +15,11 @@ class UpdateErrorCodes:
     @hookimpl
     def prepare_release_update_version(self, session, config, version):
         import json
+
         from exasol.error._error import _create_error_code_definitions
-        definitions = _create_error_code_definitions(f'{version}')
-        with open(UpdateErrorCodes.ERROR_CODES, 'w') as f:
+
+        definitions = _create_error_code_definitions(f"{version}")
+        with open(UpdateErrorCodes.ERROR_CODES, "w") as f:
             json.dump(definitions, f)
 
     @hookimpl
