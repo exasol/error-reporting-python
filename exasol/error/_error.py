@@ -56,6 +56,7 @@ class Error:
 # the `ec` command-line tool to update and create their project specifc error-codes.json file.
 LIBRARY_ERRORS = {
     "E-ERP-1": {
+        "identifier": "E-ERP-1",
         "message": "Invalid error code {{code}}.",
         "messagePlaceholders": [
             {
@@ -67,6 +68,7 @@ LIBRARY_ERRORS = {
         "sourceFile": Path(__file__).name
     },
     "E-ERP-2": {
+        "identifier": "E-ERP-2",
         "message": "Unknown error/exception occurred.",
         "messagePlaceholders": [
             {
@@ -112,7 +114,7 @@ def ExaError(
         error_code = 'E-ERP-1'
         error_details = LIBRARY_ERRORS[error_code]
         return Error(
-            code=error_code,
+            code=error_details['identifier'],
             message=error_details['message'],
             mitigations=error_details['mitigations'],
             parameters={"code": code}
@@ -124,8 +126,23 @@ def ExaError(
         error_code = 'E-ERP-2'
         error_details = LIBRARY_ERRORS[error_code]
         return Error(
-            code=error_code,
+            code=error_details['identifier'],
             message=error_details['message'],
             mitigations=error_details['mitigations'],
             parameters=parameters
         )
+
+
+def _create_error_code_definitions(version=None):
+    from exasol.error.version import VERSION
+    version = version or VERSION
+    return {
+        "$schema": "https://schemas.exasol.com/error_code_report-1.0.0.json",
+        "projectName": "exasol-error-reporting",
+        "projectVersion": version,
+        "errorCodes": [code for code in LIBRARY_ERRORS.values()]
+    }
+
+
+if __name__ == "__main__":
+    pass
