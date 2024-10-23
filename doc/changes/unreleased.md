@@ -13,6 +13,10 @@
 
 * #33: Updated to Python 3.10
 
+## Documentation
+
+* Update project documentation
+
 ## Internal
 * Relock Dependencies
 
