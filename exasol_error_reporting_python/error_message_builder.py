@@ -6,7 +6,7 @@ from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
 ERROR_CODE_FORMAT = "^[FEW]-[A-Z][A-Z0-9]+(-[A-Z][A-Z0-9]+)*-[0-9]+$"
 
 
-class InvalidErrorCode(Exception):
+class InvalidErrorCode(ValueError):
     """
     Indicates that the error code does not comply with the commonly defined error code format.
     """
