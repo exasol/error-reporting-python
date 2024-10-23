@@ -91,9 +91,6 @@ you can use the generate subcommand.
 ec generate NAME VERSION PACKAGE_ROOT > error-codes.json
 ```
 
-## Known Issues
-* [Throws exception on invalid error code format](https://github.com/exasol/error-reporting-python/issues/27)
-
 ### Information for Users
 
 * [User Guide](doc/user_guide/user_guide.md)

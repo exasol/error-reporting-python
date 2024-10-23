@@ -22,40 +22,51 @@ def does_not_raise():
     "expected,data",
     [
         (
-            cleandoc(
-                """
-                        E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
-                        * Delete something from '/dev/sda1'.
-                        * Create larger partition.
-                        """
-            ),
-            Data(
-                code="E-TEST-1",
-                message="Not enough space on device {{device}}.",
-                mitigations=[
-                    "Delete something from {{device}}.",
-                    "Create larger partition.",
-                ],
-                parameters={"device": Parameter("/dev/sda1", "name of the device")},
-            ),
-        ),
-        (
-            cleandoc(
-                """
+                cleandoc(
+                    """
                             E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
                             * Delete something from '/dev/sda1'.
                             * Create larger partition.
                             """
-            ),
-            Data(
-                code="E-TEST-1",
-                message="Not enough space on device {{device}}.",
-                mitigations=[
-                    "Delete something from {{device}}.",
-                    "Create larger partition.",
-                ],
-                parameters={"device": "/dev/sda1"},
-            ),
+                ),
+                Data(
+                    code="E-TEST-1",
+                    message="Not enough space on device {{device}}.",
+                    mitigations=[
+                        "Delete something from {{device}}.",
+                        "Create larger partition.",
+                    ],
+                    parameters={"device": Parameter("/dev/sda1", "name of the device")},
+                ),
+        ),
+        (
+                cleandoc(
+                    """
+                                E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
+                                * Delete something from '/dev/sda1'.
+                                * Create larger partition.
+                                """
+                ),
+                Data(
+                    code="E-TEST-1",
+                    message="Not enough space on device {{device}}.",
+                    mitigations=[
+                        "Delete something from {{device}}.",
+                        "Create larger partition.",
+                    ],
+                    parameters={"device": "/dev/sda1"},
+                ),
+        ),
+        (
+                cleandoc(
+                    "E-ERP-1: Invalid error code 'WRONGCODE'. Ensure you follow the standard error code format."
+                ),
+                Data(
+                    code="WRONGCODE",
+                    message="some error message",
+                    mitigations=["unrecoverable ;P"],
+                    parameters={},
+                ),
         ),
     ],
 )
@@ -65,29 +76,59 @@ def test_exa_error_as_string(expected, data):
     assert actual == expected
 
 
-@pytest.mark.xfail(
-    True,
-    reason="Old implementation does not avoid throwing exceptions, further refactoring is needed.",
-)
 @pytest.mark.parametrize(
     "data",
     [
         (
-            Data(
-                code="BROKEN_ERROR_CODE",
-                message='"Not enough space on device {{device}}."',
-                mitigations=[
-                    "Delete something from {{device}}.",
-                    "Create larger partition.",
-                ],
-                parameters={"device": Parameter("/dev/sda1", "name of the device")},
-            )
+                Data(
+                    code="BROKEN_ERROR_CODE",
+                    message='"Not enough space on device {{device}}."',
+                    mitigations=[
+                        "Delete something from {{device}}.",
+                        "Create larger partition.",
+                    ],
+                    parameters={"device": Parameter("/dev/sda1", "name of the device")},
+                )
         ),
     ],
 )
 def test_exa_error_does_not_throw_error_on_invalid(data):
     with does_not_raise():
         _ = ExaError(data.code, data.message, data.mitigations, data.parameters)
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        Data(
+            code="E-TEST-1",
+            message="some error message",
+            mitigations=["unrecoverable ;P"],
+            parameters={},
+        ),
+    ],
+)
+def test_raising_message_builder(data):
+    from unittest.mock import patch
+    from exasol_error_reporting_python.exa_error import ExaError as Error
+
+    actual_impl = Error.message_builder
+
+    def builder(error_code):
+        if error_code == "E-ERP-2":
+            return actual_impl(error_code)
+        raise Exception(f"{error_code}")
+
+    with patch("exasol_error_reporting_python.exa_error.ExaError") as mock:
+        mock.message_builder = builder
+        error = ExaError(data.code, data.message, data.mitigations, data.parameters)
+    actual = str(error)
+    expected = cleandoc("""
+        E-ERP-2: Unknown error/exception occurred. A good starting point would be to investigate the cause of the attached exception.
+
+        Trackback:
+    """)
+    assert expected in actual
 
 
 def test_using_the_old_api_produces_deprecation_warning():
