@@ -6,6 +6,12 @@ from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
 ERROR_CODE_FORMAT = "^[FEW]-[A-Z][A-Z0-9]+(-[A-Z][A-Z0-9]+)*-[0-9]+$"
 
 
+class InvalidErrorCode(Exception):
+    """
+    Indicates that the error code does not comply with the commonly defined error code format.
+    """
+
+
 class ErrorMessageBuilder:
     """
     This class is a builder for Exasol error messages.
@@ -13,7 +19,7 @@ class ErrorMessageBuilder:
 
     def __init__(self, error_code: str):
         if not re.compile(ERROR_CODE_FORMAT).match(error_code):
-            raise ValueError(f"{error_code} is an invalid error-code format")
+            raise InvalidErrorCode(f"{error_code} is an invalid error-code format")
 
         self._error_code = error_code
         self._message_builder = []
@@ -64,8 +70,10 @@ class ErrorMessageBuilder:
         :return: self of the ErrorMessageBuilder object
         """
 
-        self.mitigation("This is an internal error that should not happen. "
-                        "Please report it by opening a GitHub issue.")
+        self.mitigation(
+            "This is an internal error that should not happen. "
+            "Please report it by opening a GitHub issue."
+        )
         return self
 
     def parameter(self, placeholder: str, value: Any, description: str = None):
@@ -97,7 +105,7 @@ class ErrorMessageBuilder:
 
         self._parameter_dict = {
             **self._parameter_dict,
-            **ParametersMapper.get_params_dict(text, arguments)
+            **ParametersMapper.get_params_dict(text, arguments),
         }
 
     def _replace_placeholder(self, text: str) -> str:
@@ -108,8 +116,7 @@ class ErrorMessageBuilder:
         :return: formatted text by replacing placeholders with arguments.
         """
 
-        return PlaceholderHandler.replace_placeholder(
-            text, self._parameter_dict)
+        return PlaceholderHandler.replace_placeholder(text, self._parameter_dict)
 
     def __str__(self):
         result = []
@@ -125,8 +132,9 @@ class ErrorMessageBuilder:
         elif len(self._mitigations) > 1:
             mitigations = ["Known mitigations:"]
             for mitigation in self._mitigations:
-                mitigations.append("".join(
-                    ("* ", self._replace_placeholder(mitigation))))
+                mitigations.append(
+                    "".join(("* ", self._replace_placeholder(mitigation)))
+                )
             result.append("\n".join(mitigations))
 
         return " ".join(result)

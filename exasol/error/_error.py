@@ -7,6 +7,7 @@ from pathlib import Path
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     from exasol_error_reporting_python import exa_error
+    from exasol_error_reporting_python.error_message_builder import InvalidErrorCode
 
 
 @dataclass(frozen=True)
@@ -110,7 +111,7 @@ def ExaError(
     """
     try:
         return Error(code, message, mitigations, parameters)
-    except ValueError:
+    except InvalidErrorCode:
         error_code = 'E-ERP-1'
         error_details = LIBRARY_ERRORS[error_code]
         return Error(
