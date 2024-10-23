@@ -43,6 +43,7 @@ ec = 'exasol.error._cli:main'
 relative_files = true
 source = [
     "exasol",
+    "exasol_error_reporting_python",
 ]
 
 [tool.coverage.report]
@@ -70,7 +71,6 @@ max-module-lines = 800
 
 [[tool.mypy.overrides]]
 module = [
-    "exasol.toolbox.sphinx.multiversion.*",
     "test.unit.*",
     "test.integration.*",
 ]
