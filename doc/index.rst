@@ -31,12 +31,6 @@ Error-Reporting-Python
 
         Detailed descriptions, syntax, and usage examples for the API provided by this project.
 
-    .. grid-item-card:: :octicon:`repo` Design Document
-        :link: design_document
-        :link-type: ref
-
-        Document outlining the architectural and design principles and decisions in this project.
-
     .. grid-item-card:: :octicon:`package` Dependencies
         :link: dependencies
         :link-type: ref
@@ -58,9 +52,8 @@ Error-Reporting-Python
    developer_guide/developer_guide
    tools
    api
-   design
-   faq
    dependencies
+   faq
    changes/changelog
 
 

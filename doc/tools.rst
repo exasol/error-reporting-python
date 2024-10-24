@@ -3,28 +3,43 @@
 :octicon:`terminal` Tools
 =========================
 
-The python-toolbox ships with a set of command line tools, whose entry point always is the command :code:`tbx`.
-The commands are structured in a *tree* manner, and help is provided along with the command(s) no matter the nesting.
+The error-reporting-python library comes with a set of command-line tools to assist working with error definitions. The main entry point of these tools is the :code:`ec` command.
 
 How to get Help
 ---------------
 
 .. code-block:: shell
 
-     $ tbx --help
+     $ ec --help
 
 .. code-block:: shell
 
-     $ tbx command --help
+     $ ec parse --help
 
 .. code-block:: shell
 
-     $ tbx command subcommand --help
+     $ ec generate --help
+
+Example Usages
+--------------
+
+Parsing the error definitions in a python file(s)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: shell
 
-     $ tbx command subcommand subsubcommand --help
+    ec parse some-python-file.py 
+    
+.. code-block:: shell
+    
+    ec parse < some-python-file.py 
 
+Generating an error-code data file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the details for a specific command are not sufficient checkout the according subsections bellow,
-or `create an isssue <https://github.com/exasol/python-toolbox/issues/new?assignees=&labels=documentation&projects=&template=documentation.md&title=%F0%9F%93%9A+%3CInsert+Title%3E>`_ if nothing is avialable yet.
+In order to generate a `error-code-report <https://schemas.exasol.com/error_code_report-1.0.0.json>`__ compliant data file,
+you can use the generate subcommand.
+
+.. code-block:: shell
+
+    ec generate NAME VERSION PACKAGE_ROOT > error-codes.json

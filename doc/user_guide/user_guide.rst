@@ -3,10 +3,7 @@
 :octicon:`person` User Guide
 ============================
 
-This project contains a Python library for describing Exasol error messages.
-This library lets you define errors with a uniform set of attributes.
-Furthermore, the error message is implemented to be parseable,
-so that you can extract an error catalog from the code.
+This project provides a Python library for defining Exasol-compliant errors. Additionally, the defined errors can be parsed, allowing you to extract an error catalog from the code.
 
 Error Objects
 ~~~~~~~~~~~~~
@@ -123,43 +120,14 @@ Check out the `user guide <doc/user_guide/user_guide.md>`_ for more details.
 Tooling
 ~~~~~~~
 
-The :code:`exasol-error-reporting` library comes with a command line tool (:code:`ec`) which also can be invoked by using its package/module entry point (:code:`python -m exasol.error._cli`). For detailed information about the usage consider consulting the help :code:`ec --help` or :code:`python -m exasol.error._cli --help`.
+The :code:`exasol-error-reporting` library includes command-line tools to manage and work with error definitions. For further details, see the :ref:`tools` section of the documentation.
 
-Parsing the error definitions in a python file(s)
--------------------------------------------------
+Links & References
+~~~~~~~~~~~~~~~~~~
 
-.. code-block:: shell
-
-    ec parse some-python-file.py 
-
-.. code-block:: shell
-
-    ec parse < some-python-file.py 
-
-Generating an error-code data file
-----------------------------------
-
-In order to generate an `error-code-report <https://schemas.exasol.com/error_code_report-1.0.0.json>`_ compliant data file, you can use subcommand :code:`generate`:
-
-.. code-block:: shell
-
-    ec generate NAME VERSION PACKAGE_ROOT > error-codes.json
-
-Information for Users
----------------------
-
-* `User Guide <doc/user_guide/user_guide.md>`_
-* `Changelog <doc/changes/changelog.md>`_
-
-You can find corresponding libraries for other languages here:
+* `Error Code Report Schemas <https://schemas.exasol.com>`_
 * `Error reporting Java <https://github.com/exasol/error-reporting-java>`_
 * `Error reporting Lua <https://github.com/exasol/error-reporting-lua>`_
 * `Error reporting Go <https://github.com/exasol/error-reporting-go>`_
 * `Error reporting C# <https://github.com/exasol/error-reporting-csharp>`_
 
-Information for Contributors
-----------------------------
-
-* `System Requirement Specification <doc/system_requirements.md>`_
-* `Design <doc/design.md>`_
-* `Dependencies <doc/dependencies.md>`_

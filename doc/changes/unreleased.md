@@ -15,9 +15,10 @@
 
 ## Documentation
 
-* Update project documentation
+* Reworked project documentation
 
 ## Internal
-* Relock Dependencies
-* Add github issue templates
+
+* Relocked Dependencies
+* Added github issue templates
 
