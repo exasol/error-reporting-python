@@ -91,20 +91,7 @@ you can use the generate subcommand.
 ec generate NAME VERSION PACKAGE_ROOT > error-codes.json
 ```
 
-### Information for Users
 
-* [User Guide](doc/user_guide/user_guide.md)
-* [Changelog](doc/changes/changelog.md)
+## Links and References
 
-You can find corresponding libraries for other languages here:
-
-* [Error reporting Java](https://github.com/exasol/error-reporting-java)
-* [Error reporting Lua](https://github.com/exasol/error-reporting-lua)
-* [Error reporting Go](https://github.com/exasol/error-reporting-go)
-* [Error reporting C#](https://github.com/exasol/error-reporting-csharp)
-
-### Information for Contributors
-
-* [System Requirement Specification](doc/system_requirements.md)
-* [Design](doc/design.md)
-* [Dependencies](doc/dependencies.md)
+For further details check out the [project documentation](https://exasol.github.io/error-reporting-python/).
