@@ -12,7 +12,7 @@ Error Objects
 ~~~~~~~~~~~~~
 
 Error objects are built using the function :code:`ExaError`.
-Please keep in mind that error-code should satisfy the error-code format (see `code`_).
+Please keep in mind that an error-code should satisfy the error-code format (see `code`_).
 
 Flexibility is provided by introducing placeholder parameters to the error message.
 
