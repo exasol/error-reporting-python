@@ -1,4 +1,4 @@
 .. _faq:
 
-FAQ
-===
+:octicon:`question` FAQ
+=======================
