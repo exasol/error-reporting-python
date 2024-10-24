@@ -139,7 +139,7 @@ Parsing the error definitions in a python file(s)
 Generating an error-code data file
 ----------------------------------
 
-In order to generate a `error-code-report <https://schemas.exasol.com/error_code_report-1.0.0.json>`_ compliant data file, you can use the generate subcommand.
+In order to generate an `error-code-report <https://schemas.exasol.com/error_code_report-1.0.0.json>`_ compliant data file, you can use subcommand :code:`generate`:
 
 .. code-block:: shell
 
