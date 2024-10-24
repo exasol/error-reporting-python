@@ -93,4 +93,5 @@ ec generate NAME VERSION PACKAGE_ROOT > error-codes.json
 
 
 ## Links and References
+
 For further details check out the [project documentation](https://exasol.github.io/error-reporting-python/).
