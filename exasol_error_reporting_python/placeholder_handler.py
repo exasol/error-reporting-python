@@ -1,5 +1,9 @@
 import re
-from typing import Any, Iterable
+from typing import (
+    Any,
+    Iterable,
+)
+
 from exasol_error_reporting_python.placeholder import Placeholder
 
 
@@ -24,9 +28,7 @@ class PlaceholderHandler:
         """
 
         for match in re.finditer(cls.PLACEHOLDER_PATTERN, text):
-            yield Placeholder(
-                key=match.group(0),
-                text=match.group(1))
+            yield Placeholder(key=match.group(0), text=match.group(1))
 
     @classmethod
     def replace_placeholder(cls, text: str, parameter_dict: dict) -> str:
@@ -41,14 +43,14 @@ class PlaceholderHandler:
         """
 
         for placeholder in cls.get_placeholders(text):
-            replacement = cls.get_parameter_from_dict(
-                placeholder, parameter_dict)
+            replacement = cls.get_parameter_from_dict(placeholder, parameter_dict)
             text = text.replace(placeholder.key, replacement)
         return text
 
     @classmethod
-    def get_parameter_from_dict(cls, placeholder: Placeholder,
-                                parameter_dict: dict) -> Any:
+    def get_parameter_from_dict(
+        cls, placeholder: Placeholder, parameter_dict: dict
+    ) -> Any:
         """
         Return parameter for the given placeholder, if any, considering
         whether the parameter will be quoted or not. Otherwise, returns <null>.
@@ -66,7 +68,7 @@ class PlaceholderHandler:
         if cls.is_unquoted_param(placeholder, parameter):
             return str(parameter)
         else:
-            return "'{}'".format(parameter)
+            return f"'{parameter}'"
 
     @classmethod
     def is_unquoted_param(cls, placeholder: Placeholder, parameter: Any):
@@ -78,5 +80,4 @@ class PlaceholderHandler:
 
         :return: True if the given parameter will not be quoted.
         """
-        return placeholder.is_unquoted() \
-               or not isinstance(parameter, str)
+        return placeholder.is_unquoted() or not isinstance(parameter, str)

@@ -1,4 +1,5 @@
 """defines nox tasks/targets for this project"""
+
 import nox
 
 # imports all nox task provided by the toolbox

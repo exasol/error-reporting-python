@@ -1,6 +1,6 @@
 from typing import Any
-from exasol_error_reporting_python.placeholder_handler\
-    import PlaceholderHandler
+
+from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
 
 
 class ParametersMapper:
@@ -8,6 +8,7 @@ class ParametersMapper:
     This class is responsible for mapping positional arguments to corresponding
     placeholders in messages.
     """
+
     def __init__(self, text: str, arguments: str):
         self._text = text
         self._parameters = arguments
@@ -38,8 +39,7 @@ class ParametersMapper:
 
         for placeholder in PlaceholderHandler.get_placeholders(self._text):
             if self._is_parameter_present():
-                self._parameter_dict[placeholder.name] = \
-                    self._get_current_parameter()
+                self._parameter_dict[placeholder.name] = self._get_current_parameter()
             self._next_parameters()
 
     def _get_current_parameter(self) -> Any:
@@ -48,8 +48,11 @@ class ParametersMapper:
 
         :return: a parameter in the parameters list or None
         """
-        return self._parameters[self._parameter_idx] \
-            if self._is_parameter_present() else None
+        return (
+            self._parameters[self._parameter_idx]
+            if self._is_parameter_present()
+            else None
+        )
 
     def _is_parameter_present(self) -> bool:
         """
@@ -57,8 +60,7 @@ class ParametersMapper:
 
         :return: True if present, False otherwise
         """
-        return self._parameters and \
-               self._parameter_idx < len(self._parameters)
+        return self._parameters and self._parameter_idx < len(self._parameters)
 
     def _next_parameters(self):
         """
@@ -66,5 +68,3 @@ class ParametersMapper:
         """
 
         self._parameter_idx += 1
-
-
