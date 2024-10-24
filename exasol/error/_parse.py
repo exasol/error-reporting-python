@@ -3,9 +3,19 @@ import io
 from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator, Iterable, List, Optional, Tuple, Union
+from typing import (
+    Generator,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
-from exasol.error._report import ErrorCodeDetails, Placeholder
+from exasol.error._report import (
+    ErrorCodeDetails,
+    Placeholder,
+)
 
 
 class _ExaErrorNodeWalker:
@@ -39,7 +49,12 @@ def _extract_parameters(node: ast.Call):
     for keyword_argument in node.keywords:
         kwargs[keyword_argument.arg] = keyword_argument.value
 
-    return kwargs["code"], kwargs["message"], kwargs["mitigations"], kwargs["parameters"]
+    return (
+        kwargs["code"],
+        kwargs["message"],
+        kwargs["mitigations"],
+        kwargs["parameters"],
+    )
 
 
 class Validator:
@@ -69,7 +84,7 @@ class Validator:
         return self._warnings
 
     def validate(
-            self, node: ast.Call, file: str
+        self, node: ast.Call, file: str
     ) -> Tuple[List["Validator.Error"], List["Validator.Warning"]]:
         code: ast.Constant
         message: ast.Constant
@@ -110,8 +125,7 @@ class Validator:
         if not isinstance(node, ast.Constant):
             self._errors.append(
                 self.Error(
-                    message=self._error_msg.format(
-                        type="message", value=type(node)),
+                    message=self._error_msg.format(type="message", value=type(node)),
                     file=file,
                     line_number=node.lineno,
                 )
@@ -150,8 +164,7 @@ class Validator:
             if not isinstance(key, ast.Constant):
                 self._errors.append(
                     self.Error(
-                        message=self._error_msg.format(
-                            type="key", value=type(key)),
+                        message=self._error_msg.format(type="key", value=type(key)),
                         file=file,
                         line_number=key.lineno,
                     )
@@ -215,12 +228,14 @@ class ErrorCollector:
             internalDescription=None,
             potentialCauses=None,
             mitigations=(
-                [m.value for m in mitigations.elts]
-                if isinstance(mitigations, ast.List)
-                else [mitigations.value]
-            )
-            if not isinstance(mitigations, str)
-            else [mitigations],
+                (
+                    [m.value for m in mitigations.elts]
+                    if isinstance(mitigations, ast.List)
+                    else [mitigations.value]
+                )
+                if not isinstance(mitigations, str)
+                else [mitigations]
+            ),
             sourceFile=self._filename,
             sourceLine=node.lineno,
             contextHash=None,
@@ -236,21 +251,15 @@ class ErrorCollector:
             self._error_definitions.append(error_definition)
 
 
-def parse_file(
-        file: Union[str, Path, io.FileIO]
-) -> Tuple[
+def parse_file(file: Union[str, Path, io.FileIO]) -> Tuple[
     Iterable[ErrorCodeDetails],
     Iterable["Validator.Warning"],
     Iterable["Validator.Error"],
 ]:
     with ExitStack() as stack:
-        f = (
-            file
-            if isinstance(file, io.TextIOBase)
-            else stack.enter_context(open(file, "r"))
-        )
+        f = file if isinstance(file, io.TextIOBase) else stack.enter_context(open(file))
         root_node = ast.parse(f.read())
-        name = f.name if hasattr(f, 'name') else f'<{f.__class__.__name__}>'
+        name = f.name if hasattr(f, "name") else f"<{f.__class__.__name__}>"
         collector = ErrorCollector(root_node, name)
         collector.collect()
 

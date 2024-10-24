@@ -1,8 +1,14 @@
 import warnings
 from dataclasses import dataclass
 from inspect import cleandoc
-from typing import Dict, Iterable, List, Mapping, Union
 from pathlib import Path
+from typing import (
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Union,
+)
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -18,11 +24,11 @@ class Parameter:
 
 class Error:
     def __init__(
-            self,
-            code: str,
-            message: str,
-            mitigations: Union[str, Iterable[str]],
-            parameters: Dict[str, Union[str, Parameter]],
+        self,
+        code: str,
+        message: str,
+        mitigations: Union[str, Iterable[str]],
+        parameters: Dict[str, Union[str, Parameter]],
     ):
         # This function maybe flattened into or moved out of the constructor in the future.
         def build_error(code, msg, mitigations, params):
@@ -62,11 +68,11 @@ LIBRARY_ERRORS = {
         "messagePlaceholders": [
             {
                 "placeholder": "code",
-                "description": "Error code which was causing the error."
+                "description": "Error code which was causing the error.",
             }
         ],
         "mitigations": ["Ensure you follow the standard error code format."],
-        "sourceFile": Path(__file__).name
+        "sourceFile": Path(__file__).name,
     },
     "E-ERP-2": {
         "identifier": "E-ERP-2",
@@ -74,26 +80,30 @@ LIBRARY_ERRORS = {
         "messagePlaceholders": [
             {
                 "placeholder": "traceback",
-                "description": "Exception traceback which lead to the generation of this error."
+                "description": "Exception traceback which lead to the generation of this error.",
             }
         ],
         "description": "An unexpected error occurred during the creation of the error",
-        "mitigations": [cleandoc("""
+        "mitigations": [
+            cleandoc(
+                """
                     A good starting point would be to investigate the cause of the attached exception.
         
                     Trackback:
                         {{traceback}}
-                    """)],
-        "sourceFile": Path(__file__).name
+                    """
+            )
+        ],
+        "sourceFile": Path(__file__).name,
     },
 }
 
 
 def ExaError(
-        code: str,
-        message: str,
-        mitigations: Union[str, List[str]],
-        parameters: Mapping[str, Union[str, Parameter]],
+    code: str,
+    message: str,
+    mitigations: Union[str, List[str]],
+    parameters: Mapping[str, Union[str, Parameter]],
 ) -> Error:
     """Create a new ExaError.
 
@@ -112,36 +122,38 @@ def ExaError(
     try:
         return Error(code, message, mitigations, parameters)
     except InvalidErrorCode:
-        error_code = 'E-ERP-1'
+        error_code = "E-ERP-1"
         error_details = LIBRARY_ERRORS[error_code]
         return Error(
-            code=error_details['identifier'],
-            message=error_details['message'],
-            mitigations=error_details['mitigations'],
-            parameters={"code": code}
+            code=error_details["identifier"],
+            message=error_details["message"],
+            mitigations=error_details["mitigations"],
+            parameters={"code": code},
         )
     except Exception as ex:
         import traceback
+
         tb = traceback.format_exc()
         parameters = {"traceback": tb}
-        error_code = 'E-ERP-2'
+        error_code = "E-ERP-2"
         error_details = LIBRARY_ERRORS[error_code]
         return Error(
-            code=error_details['identifier'],
-            message=error_details['message'],
-            mitigations=error_details['mitigations'],
-            parameters=parameters
+            code=error_details["identifier"],
+            message=error_details["message"],
+            mitigations=error_details["mitigations"],
+            parameters=parameters,
         )
 
 
 def _create_error_code_definitions(version=None):
     from exasol.error.version import VERSION
+
     version = version or VERSION
     return {
         "$schema": "https://schemas.exasol.com/error_code_report-1.0.0.json",
         "projectName": "exasol-error-reporting",
         "projectVersion": version,
-        "errorCodes": [code for code in LIBRARY_ERRORS.values()]
+        "errorCodes": [code for code in LIBRARY_ERRORS.values()],
     }
 
 

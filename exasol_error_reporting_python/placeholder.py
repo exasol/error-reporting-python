@@ -1,4 +1,3 @@
-
 class Placeholder:
     """
     A data class holds information about Placeholder.
@@ -35,6 +34,4 @@ class Placeholder:
 
         :return: the text in which the unquotation suffix is removed
         """
-        return self.text[:-len(self._unquoted_suffix)]
-    
- 
+        return self.text[: -len(self._unquoted_suffix)]
