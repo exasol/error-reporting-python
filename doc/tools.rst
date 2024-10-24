@@ -38,7 +38,7 @@ Generating an error-code data file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to generate a `error-code-report <https://schemas.exasol.com/error_code_report-1.0.0.json>`__ compliant data file,
-you can use the generate subcommand.
+you can use the subcommand :code:`generate`:.
 
 .. code-block:: shell
 
