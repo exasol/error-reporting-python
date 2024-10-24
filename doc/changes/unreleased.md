@@ -19,4 +19,5 @@
 
 ## Internal
 * Relock Dependencies
+* Add github issue templates
 
