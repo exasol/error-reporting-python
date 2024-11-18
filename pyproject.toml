@@ -71,6 +71,10 @@ max-module-lines = 800
 
 [[tool.mypy.overrides]]
 module = [
+    "exasol_error_reporting_python.*",
+    "exasol.*",
+    "noxfile",
+    "noxconfig",
     "test.unit.*",
     "test.integration.*",
 ]
