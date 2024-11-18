@@ -1,6 +1,8 @@
 name: Publish Documentation
 
-on: workflow_call
+on: 
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
 
@@ -14,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python & Poetry Environment
-        uses: exasol/python-toolbox/.github/actions/python-environment@0.16.0
+        uses: exasol/python-toolbox/.github/actions/python-environment@0.17.0
 
       - name: Build Documentation
         run: |
