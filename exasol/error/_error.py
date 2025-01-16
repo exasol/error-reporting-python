@@ -69,7 +69,12 @@ class Error:
             return _name(error) + _message(error)
 
         def _long(error: Error):
-            return _name(error) + _message(error) + _mitigations(error) + _parameters(error)
+            return (
+                _name(error)
+                + _message(error)
+                + _mitigations(error)
+                + _parameters(error)
+            )
 
         output = ""
         formats = {
@@ -79,7 +84,7 @@ class Error:
             "parameters": _parameters(self),
             "short": _short(self),
             "long": _long(self),
-            "" : "",
+            "": "",
         }
         for part in format_spec.split(" "):
             if part in formats:
