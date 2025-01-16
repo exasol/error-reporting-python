@@ -52,8 +52,45 @@ class Error:
     def __str__(self) -> str:
         return f"{self._error}"
 
-    # TODO: Implement __format__ to conveniently support long and short reporting format
-    # See also see, Github Issue #28 https://github.com/exasol/error-reporting-python/issues/28
+    def __format__(self, format_spec: str):
+        def _name(error: Error):
+            return f"{error._error._error_code} "
+
+        def _message(error: Error):
+            return f"{error._error._message_builder} "
+
+        def _mitigations(error: Error):
+            return f"{error._error._mitigations} "
+
+        def _parameters(error: Error):
+            return f"{error._error._parameter_dict} "
+
+        def _short(error: Error):
+            return _name(error) + _message(error)
+
+        def _long(error: Error):
+            return (
+                _name(error)
+                + _message(error)
+                + _mitigations(error)
+                + _parameters(error)
+            )
+
+        output = ""
+        formats = {
+            "name": _name(self),
+            "message": _message(self),
+            "mitigations": _mitigations(self),
+            "parameters": _parameters(self),
+            "short": _short(self),
+            "long": _long(self),
+            "": "",
+        }
+        for part in format_spec.split(" "):
+            if part in formats:
+                output += formats[part]
+
+        return output[:-1]
 
 
 # ATTENTION: In the event of an exception while creating an error, we encounter a chicken-and-egg problem regarding error definitions.
