@@ -1,5 +1,5 @@
 import re
-from typing import Any
+from typing import Any, List, Dict, Optional
 
 from exasol_error_reporting_python.parameters_mapper import ParametersMapper
 from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
@@ -18,16 +18,16 @@ class ErrorMessageBuilder:
     This class is a builder for Exasol error messages.
     """
 
-    def __init__(self, error_code: str):
+    def __init__(self, error_code: str) -> None:
         if not re.compile(ERROR_CODE_FORMAT).match(error_code):
             raise InvalidErrorCode(f"{error_code} is an invalid error-code format")
 
         self._error_code = error_code
-        self._message_builder = []
-        self._mitigations = []
-        self._parameter_dict = {}
+        self._message_builder: List[str] = []
+        self._mitigations: List[str] = []
+        self._parameter_dict: Dict[str, str] = {}
 
-    def message(self, message: str, *arguments):
+    def message(self, message: str, *arguments) -> "ErrorMessageBuilder":
         """
         Add the given error message to the error builder list and invokes
         the method that performs mapping of the given parameters with the
@@ -46,7 +46,7 @@ class ErrorMessageBuilder:
         self._add_parameters(message, arguments)
         return self
 
-    def mitigation(self, mitigation: str, *arguments):
+    def mitigation(self, mitigation: str, *arguments) -> "ErrorMessageBuilder":
         """
         Add the given mitigation message, explaining  what users can do to
         resolve or avoid this error, to the mitigation list and invokes
@@ -63,7 +63,7 @@ class ErrorMessageBuilder:
         self._add_parameters(mitigation, arguments)
         return self
 
-    def ticket_mitigation(self):
+    def ticket_mitigation(self) -> "ErrorMessageBuilder":
         """
         Add a pre-defined mitigation message  for cases where the only thing
         a user can do is opening a ticket.
@@ -77,7 +77,7 @@ class ErrorMessageBuilder:
         )
         return self
 
-    def parameter(self, placeholder: str, value: Any, description: str = None):
+    def parameter(self, placeholder: str, value: Any, description: Optional[str] = None) -> "ErrorMessageBuilder":
         """
         Keep the given placeholder with the given parameter in a dictionary.
         This function can be used for any placeholder in message and mitigation.
@@ -92,7 +92,7 @@ class ErrorMessageBuilder:
         self._parameter_dict[placeholder] = value
         return self
 
-    def _add_parameters(self, text: str, arguments: Any):
+    def _add_parameters(self, text: str, arguments: Any) -> None:
         """
         Maps placeholders in the given text with positional arguments.
         Placeholders are defined in the text by using double curly brackets
@@ -119,7 +119,7 @@ class ErrorMessageBuilder:
 
         return PlaceholderHandler.replace_placeholder(text, self._parameter_dict)
 
-    def __str__(self):
+    def __str__(self) -> str:
         result = []
 
         if self._message_builder:

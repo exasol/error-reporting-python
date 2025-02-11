@@ -140,7 +140,7 @@ def ExaError(
     code: str,
     message: str,
     mitigations: Union[str, List[str]],
-    parameters: Mapping[str, Union[str, Parameter]],
+    parameters: Dict[str, Union[str, Parameter]],
 ) -> Error:
     """Create a new ExaError.
 
@@ -161,10 +161,16 @@ def ExaError(
     except InvalidErrorCode:
         error_code = "E-ERP-1"
         error_details = LIBRARY_ERRORS[error_code]
+        identifier = error_details["identifier"]
+        assert isinstance(identifier, str)
+        _message = error_details["message"]
+        assert isinstance(_message, str)
+        _mitigations=error_details["mitigations"]
+        assert isinstance(_mitigations, list)
         return Error(
-            code=error_details["identifier"],
-            message=error_details["message"],
-            mitigations=error_details["mitigations"],
+            code=identifier,
+            message=_message,
+            mitigations=_mitigations,
             parameters={"code": code},
         )
     except Exception as ex:
@@ -174,10 +180,16 @@ def ExaError(
         parameters = {"traceback": tb}
         error_code = "E-ERP-2"
         error_details = LIBRARY_ERRORS[error_code]
+        identifier = error_details["identifier"]
+        assert isinstance(identifier, str)
+        _message = error_details["message"]
+        assert isinstance(_message, str)
+        _mitigations=error_details["mitigations"]
+        assert isinstance(_mitigations, list)
         return Error(
-            code=error_details["identifier"],
-            message=error_details["message"],
-            mitigations=error_details["mitigations"],
+            code=identifier,
+            message=_message,
+            mitigations=_mitigations,
             parameters=parameters,
         )
 

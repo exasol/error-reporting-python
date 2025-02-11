@@ -9,7 +9,7 @@ from typing import (
     List,
     Optional,
     Tuple,
-    Union,
+    Union, Dict, Any,
 )
 
 from exasol.error._report import (
@@ -27,7 +27,7 @@ class _ExaErrorNodeWalker:
         name = getattr(node.func, "attr", "") if name == "" else name
         return name == "ExaError"
 
-    def __init__(self, root_node: ast.AST):
+    def __init__(self, root_node: ast.AST) -> None:
         self._root = root_node
 
     def __iter__(self) -> Generator[ast.Call, None, None]:
@@ -38,8 +38,8 @@ class _ExaErrorNodeWalker:
         )
 
 
-def _extract_parameters(node: ast.Call):
-    kwargs = {}
+def _extract_parameters(node: ast.Call) -> Tuple[Any, Any, Any, Any]:
+    kwargs: Dict[str, Any] = {}
     params = ["code", "message", "mitigations", "parameters"]
 
     for arg in node.args:
@@ -47,7 +47,8 @@ def _extract_parameters(node: ast.Call):
         kwargs[name] = arg
 
     for keyword_argument in node.keywords:
-        kwargs[keyword_argument.arg] = keyword_argument.value
+        if current_arg := keyword_argument.arg:
+            kwargs[current_arg] = keyword_argument.value
 
     return (
         kwargs["code"],
@@ -70,7 +71,7 @@ class Validator:
         file: str
         line_number: Optional[int]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._warnings: List["Validator.Warning"] = list()
         self._errors: List[Validator.Error] = list()
         self._error_msg = "{type} only can contain constant values, details: {value}"
@@ -109,7 +110,7 @@ class Validator:
 
         return self._errors, self._warnings
 
-    def _validate_code(self, code: ast.Constant, file: str):
+    def _validate_code(self, code: ast.Constant, file: str) -> None:
         if not isinstance(code, ast.Constant):
             self._errors.append(
                 self.Error(
@@ -121,7 +122,7 @@ class Validator:
                 )
             )
 
-    def _validate_message(self, node: ast.Constant, file: str):
+    def _validate_message(self, node: ast.Constant, file: str) -> None:
         if not isinstance(node, ast.Constant):
             self._errors.append(
                 self.Error(
@@ -131,7 +132,7 @@ class Validator:
                 )
             )
 
-    def _validate_mitigations(self, node: Union[ast.Constant, ast.List], file: str):
+    def _validate_mitigations(self, node: Union[ast.Constant, ast.List], file: str) -> None:
         if not isinstance(node, ast.List) and not isinstance(node, ast.Constant):
             self._errors.append(
                 self.Error(
@@ -158,10 +159,10 @@ class Validator:
                 ]
             )
 
-    def _validate_parameters(self, node: ast.Dict, file: str):
+    def _validate_parameters(self, node: ast.Dict, file: str) -> None:
         # Validate parameters
         for key in node.keys:
-            if not isinstance(key, ast.Constant):
+            if not isinstance(key, ast.Constant) and key is not None:
                 self._errors.append(
                     self.Error(
                         message=self._error_msg.format(type="key", value=type(key)),
@@ -185,7 +186,7 @@ class Validator:
 
 
 class ErrorCollector:
-    def __init__(self, root: ast.AST, filename: str = "<Unknown>"):
+    def __init__(self, root: ast.AST, filename: str = "<Unknown>") -> None:
         self._filename = filename
         self._root = root
         self._validator = Validator()
@@ -229,7 +230,7 @@ class ErrorCollector:
             potentialCauses=None,
             mitigations=(
                 (
-                    [m.value for m in mitigations.elts]
+                    [m.value for m in mitigations.elts] # type: ignore
                     if isinstance(mitigations, ast.List)
                     else [mitigations.value]
                 )
@@ -257,7 +258,7 @@ def parse_file(file: Union[str, Path, io.FileIO]) -> Tuple[
     Iterable["Validator.Error"],
 ]:
     with ExitStack() as stack:
-        f = file if isinstance(file, io.TextIOBase) else stack.enter_context(open(file))
+        f = file if isinstance(file, io.TextIOBase) else stack.enter_context(open(file)) # type: ignore
         root_node = ast.parse(f.read())
         name = f.name if hasattr(f, "name") else f"<{f.__class__.__name__}>"
         collector = ErrorCollector(root_node, name)
