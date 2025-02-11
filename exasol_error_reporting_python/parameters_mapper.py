@@ -18,10 +18,12 @@ class ParametersMapper:
         self._text = text
         self._parameters = arguments
         self._parameter_idx = 0
-        self._parameter_dict: Dict[str, str] = {}
+        self._parameter_dict: Dict[str, Optional[str]] = {}
 
     @classmethod
-    def get_params_dict(cls, text: str, arguments: List[str]) -> Dict[str, str]:
+    def get_params_dict(
+        cls, text: str, arguments: List[str]
+    ) -> Dict[str, Optional[str]]:
         """
         Create ParametersMapper object and return the generated dictionary
         that maps the placeholders and parameters.
@@ -45,7 +47,6 @@ class ParametersMapper:
         for placeholder in PlaceholderHandler.get_placeholders(self._text):
             if self._is_parameter_present():
                 current_parameter = self._get_current_parameter()
-                assert current_parameter is not None
                 self._parameter_dict[placeholder.name] = current_parameter
             self._next_parameters()
 

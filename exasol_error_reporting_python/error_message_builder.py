@@ -30,7 +30,7 @@ class ErrorMessageBuilder:
         self._error_code = error_code
         self._message_builder: List[str] = []
         self._mitigations: List[str] = []
-        self._parameter_dict: Dict[str, str] = {}
+        self._parameter_dict: Dict[str, Optional[str]] = {}
 
     def message(self, message: str, *arguments) -> "ErrorMessageBuilder":
         """
