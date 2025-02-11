@@ -1,4 +1,9 @@
-from typing import Any, Dict, List, Optional
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+)
 
 from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
 
@@ -16,7 +21,7 @@ class ParametersMapper:
         self._parameter_dict: Dict[str, str] = {}
 
     @classmethod
-    def get_params_dict(cls, text:str, arguments: List[str]) -> Dict[str, str]:
+    def get_params_dict(cls, text: str, arguments: List[str]) -> Dict[str, str]:
         """
         Create ParametersMapper object and return the generated dictionary
         that maps the placeholders and parameters.

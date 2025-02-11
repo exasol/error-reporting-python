@@ -165,7 +165,7 @@ def ExaError(
         assert isinstance(identifier, str)
         _message = error_details["message"]
         assert isinstance(_message, str)
-        _mitigations=error_details["mitigations"]
+        _mitigations = error_details["mitigations"]
         assert isinstance(_mitigations, list)
         return Error(
             code=identifier,
@@ -184,7 +184,7 @@ def ExaError(
         assert isinstance(identifier, str)
         _message = error_details["message"]
         assert isinstance(_message, str)
-        _mitigations=error_details["mitigations"]
+        _mitigations = error_details["mitigations"]
         assert isinstance(_mitigations, list)
         return Error(
             code=identifier,

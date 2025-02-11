@@ -1,5 +1,10 @@
 import re
-from typing import Any, List, Dict, Optional
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+)
 
 from exasol_error_reporting_python.parameters_mapper import ParametersMapper
 from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
@@ -77,7 +82,9 @@ class ErrorMessageBuilder:
         )
         return self
 
-    def parameter(self, placeholder: str, value: Any, description: Optional[str] = None) -> "ErrorMessageBuilder":
+    def parameter(
+        self, placeholder: str, value: Any, description: Optional[str] = None
+    ) -> "ErrorMessageBuilder":
         """
         Keep the given placeholder with the given parameter in a dictionary.
         This function can be used for any placeholder in message and mitigation.

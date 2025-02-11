@@ -4,12 +4,14 @@ from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
+    Any,
+    Dict,
     Generator,
     Iterable,
     List,
     Optional,
     Tuple,
-    Union, Dict, Any,
+    Union,
 )
 
 from exasol.error._report import (
@@ -132,7 +134,9 @@ class Validator:
                 )
             )
 
-    def _validate_mitigations(self, node: Union[ast.Constant, ast.List], file: str) -> None:
+    def _validate_mitigations(
+        self, node: Union[ast.Constant, ast.List], file: str
+    ) -> None:
         if not isinstance(node, ast.List) and not isinstance(node, ast.Constant):
             self._errors.append(
                 self.Error(
@@ -230,7 +234,7 @@ class ErrorCollector:
             potentialCauses=None,
             mitigations=(
                 (
-                    [m.value for m in mitigations.elts] # type: ignore
+                    [m.value for m in mitigations.elts]  # type: ignore
                     if isinstance(mitigations, ast.List)
                     else [mitigations.value]
                 )
@@ -258,7 +262,7 @@ def parse_file(file: Union[str, Path, io.FileIO]) -> Tuple[
     Iterable["Validator.Error"],
 ]:
     with ExitStack() as stack:
-        f = file if isinstance(file, io.TextIOBase) else stack.enter_context(open(file)) # type: ignore
+        f = file if isinstance(file, io.TextIOBase) else stack.enter_context(open(file))  # type: ignore
         root_node = ast.parse(f.read())
         name = f.name if hasattr(f, "name") else f"<{f.__class__.__name__}>"
         collector = ErrorCollector(root_node, name)

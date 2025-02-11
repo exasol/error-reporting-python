@@ -6,8 +6,14 @@ from itertools import chain
 from pathlib import Path
 from typing import List
 
-from exasol.error._parse import parse_file, Validator
-from exasol.error._report import JsonEncoder, ErrorCodeDetails
+from exasol.error._parse import (
+    Validator,
+    parse_file,
+)
+from exasol.error._report import (
+    ErrorCodeDetails,
+    JsonEncoder,
+)
 
 
 class ExitCode(IntEnum):
