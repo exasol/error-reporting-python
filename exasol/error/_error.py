@@ -1,3 +1,4 @@
+import dataclasses
 import warnings
 from dataclasses import dataclass
 from inspect import cleandoc
@@ -7,7 +8,6 @@ from typing import (
     Dict,
     Iterable,
     List,
-    Mapping,
     Optional,
     Union,
 )
@@ -101,7 +101,7 @@ class Error:
 
 
 @dataclass(frozen=True)
-class StaticError:
+class _ExaStaticError:
     identifier: str
     message: str
     messagePlaceholders: List[Dict[str, str]]
@@ -110,15 +110,9 @@ class StaticError:
     sourceFile: str
 
     def to_dict(self) -> Dict[str, Any]:
-        ret_val = {
-            "identifier": self.identifier,
-            "message": self.message,
-            "messagePlaceholders": self.messagePlaceholders,
-            "mitigations": self.mitigations,
-            "sourceFile": self.sourceFile,
-        }
-        if self.description is not None:
-            ret_val["description"] = self.description
+        ret_val = dataclasses.asdict(self)
+        if self.description is None:
+            del ret_val["description"]
         return ret_val
 
 
@@ -128,7 +122,7 @@ class StaticError:
 # as part of the release preparation. This is only necessary for this library, as it is the root, other libraries should use
 # the `ec` command-line tool to update and create their project specifc error-codes.json file.
 LIBRARY_ERRORS = {
-    "E-ERP-1": StaticError(
+    "E-ERP-1": _ExaStaticError(
         identifier="E-ERP-1",
         message="Invalid error code {{code}}.",
         messagePlaceholders=[
@@ -141,7 +135,7 @@ LIBRARY_ERRORS = {
         mitigations=["Ensure you follow the standard error code format."],
         sourceFile=Path(__file__).name,
     ),
-    "E-ERP-2": StaticError(
+    "E-ERP-2": _ExaStaticError(
         identifier="E-ERP-2",
         message="Unknown error/exception occurred.",
         messagePlaceholders=[
