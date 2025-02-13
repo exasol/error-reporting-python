@@ -1,8 +1,10 @@
 import ast
 import io
+import traceback
 from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
+from types import NoneType
 from typing import (
     Dict,
     Generator,
@@ -10,9 +12,16 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Type,
+    TypeVar,
     Union,
 )
 
+from mypy.checker import and_conditional_maps
+
+from exasol.error._error import Error
+from exasol.error._internal_errors import LIBRARY_ERRORS, INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG, \
+    INVALID_ERROR_CODE_DEFINITION
 from exasol.error._report import (
     ErrorCodeDetails,
     Placeholder,
@@ -67,11 +76,6 @@ def _extract_attributes(node: ast.Call) -> _ExaErrorAttributes:
 
 
 class Validator:
-    @dataclass(frozen=True)
-    class Error:
-        message: str
-        file: str
-        line_number: Optional[int]
 
     @dataclass(frozen=True)
     class Warning:
@@ -89,17 +93,16 @@ class Validator:
 
     @dataclass(frozen=True)
     class Result:
-        errors: List["Validator.Error"]
+        errors: List[Error]
         warnings: List["Validator.Warning"]
         node: Optional["Validator.ExaValidatedNode"]
 
     def __init__(self) -> None:
         self._warnings: List["Validator.Warning"] = list()
-        self._errors: List[Validator.Error] = list()
-        self._error_msg = "{type} only can contain constant values, details: {value}"
+        self._errors: List[Error] = list()
 
     @property
-    def errors(self) -> Iterable["Validator.Error"]:
+    def errors(self) -> Iterable[Error]:
         return self._errors
 
     @property
@@ -152,118 +155,145 @@ class Validator:
             node=validated_node,
         )
 
-    def _validate_code(self, code: ast.expr, file: str) -> Optional[str]:
-        if not isinstance(code, ast.Constant):
+    NodeType = TypeVar("NodeType", bound=ast.expr)
+
+    def _check_node_type(
+        self,
+        expected_type: type[NodeType],
+        node: ast.expr,
+        error_attribute: str,
+        file: str,
+    ) -> Optional[NodeType]:
+        """
+        This function validates if the given AST node ('node')  matches type 'expected_type'.
+        If it matches, then it returns it as type 'expected_type', otherwise it adds it to the internal
+        error list and return None.
+        """
+        if not isinstance(node, expected_type):
             self._errors.append(
-                self.Error(
-                    message=self._error_msg.format(
-                        type="error-codes", value=type(code)
-                    ),
-                    file=file,
-                    line_number=code.lineno,
-                )
+                Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                      message=INVALID_ERROR_CODE_DEFINITION.message,
+                      mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                      parameters={"error_element": error_attribute, "file": file, "line": node.lineno, "defined_type": type(node)})
             )
             return None
         else:
+            return node
+
+    def _check_node_types(
+        self,
+        expected_type_one: type[NodeType],
+        expected_type_two: type[NodeType],
+        node: ast.expr,
+        error_attribute: str,
+        file: str,
+    ) -> Optional[NodeType]:
+        """
+        This function validates if the given AST node ('node')  matches type 'expected_type_one' or 'expected_type_two'.
+        If it matches, then it returns it as type Union[expected_type_one, expected_type_two],
+        otherwise it adds it to the internal error list and return None.
+        """
+        if not isinstance(node, (expected_type_one, expected_type_two)):
+            self._errors.append(
+                Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                      message=INVALID_ERROR_CODE_DEFINITION.message,
+                      mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                      parameters={"error_element": error_attribute, "file": file, "line": node.lineno, "defined_type": type(node)})
+            )
+            return None
+        else:
+            return node
+
+    def _validate_code(self, node: ast.expr, file: str) -> Optional[str]:
+        if code := self._check_node_type(ast.Constant, node, "error-codes", file):
             return code.value
+        else:
+            return None
 
     def _validate_message(self, node: ast.expr, file: str) -> Optional[str]:
-        if not isinstance(node, ast.Constant):
-            self._errors.append(
-                self.Error(
-                    message=self._error_msg.format(type="message", value=type(node)),
-                    file=file,
-                    line_number=node.lineno,
-                )
-            )
-            return None
+        if message := self._check_node_type(ast.Constant, node, "message", file):
+            return message.value
         else:
-            return node.value
+            return None
 
     def _validate_mitigations(self, node: ast.expr, file: str) -> Optional[List[str]]:
-        if not isinstance(node, ast.List) and not isinstance(node, ast.Constant):
-            self._errors.append(
-                self.Error(
-                    message=self._error_msg.format(
-                        type="mitigations", value=type(node)
-                    ),
-                    file=file,
-                    line_number=node.lineno,
-                )
-            )
-            return None
-        if isinstance(node, ast.List):
-            invalid = [e for e in node.elts if not isinstance(e, ast.Constant)]
-            self._errors.extend(
-                [
-                    self.Error(
-                        message=self._error_msg.format(
-                            type="mitigations", value=type(e)
-                        ),
-                        file=file,
-                        line_number=e.lineno,
-                    )
-                    for e in invalid
+        if mitigation := self._check_node_types(
+            ast.List, ast.Constant, node, "mitigations", file
+        ):
+            if isinstance(mitigation, ast.List):
+                invalid = [
+                    e for e in mitigation.elts if not isinstance(e, ast.Constant)
                 ]
-            )
-            if invalid:
-                return None
-            else:
-                return [e.value for e in node.elts if isinstance(e, ast.Constant)]
-        elif isinstance(node, ast.Constant):
-            return [node.value]
+                self._errors.extend(
+                    [
+                        Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                              message=INVALID_ERROR_CODE_DEFINITION.message,
+                              mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                              parameters={"error_element": "mitigations", "file": file, "line": node.lineno, "defined_type": type(e)})
+                        for e in invalid
+                    ]
+                )
+                if invalid:
+                    return None
+                else:
+                    return [
+                        e.value for e in mitigation.elts if isinstance(e, ast.Constant)
+                    ]
+            elif isinstance(mitigation, ast.Constant):
+                return [mitigation.value]
         return None
+
+    def normalize(self, params):
+        for k, v in zip(params.keys, params.keys):
+            if isinstance(v, ast.Call):
+                yield k.value, v[1]
+            else:
+                yield k.value, ""
+
+    def _validate_parameter_keys(self, parameter_node: ast.Dict, file: str):
+        ret_val = True
+        for key in parameter_node.keys:
+            if key is None:
+                self._errors.append(
+                    Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                          message=INVALID_ERROR_CODE_DEFINITION.message,
+                          mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                          parameters={"error_element": "parameter keys", "file": file, "line": parameter_node.lineno,
+                                      "defined_type": "NoneType"})
+                )
+                ret_val = False
+            elif not self._check_node_type(
+                ast.Constant, key, "key", file
+            ):
+                ret_val = False
+        return ret_val
+
+    def _validate_parameter_values(
+        self, pparameter_node: ast.Dict, file: str
+    ) -> bool:
+        ret_val = True
+        for value in pparameter_node.values:
+            if isinstance(value, ast.Call):
+                description = value.args[1]
+                if not self._check_node_type(
+                    ast.Constant, description, "description", file
+                ):
+                    ret_val = False
+        return ret_val
 
     def _validate_parameters(
         self, node: ast.expr, file: str
     ) -> Optional[List[Tuple[str, str]]]:
-        def normalize(params):
-            for k, v in zip(params.keys, params.keys):
-                if isinstance(v, ast.Call):
-                    yield k.value, v[1]
-                else:
-                    yield k.value, ""
 
-        if not isinstance(node, ast.Dict):
-            self._errors.append(
-                self.Error(
-                    message=self._error_msg.format(type="parameters", value=type(node)),
-                    file=file,
-                    line_number=node.lineno,
-                )
-            )
-            return None
-        else:
-            is_ok = True
-            # Validate parameters
-            for key in node.keys:
-                if not isinstance(key, ast.Constant) and key is not None:
-                    self._errors.append(
-                        self.Error(
-                            message=self._error_msg.format(type="key", value=type(key)),
-                            file=file,
-                            line_number=key.lineno,
-                        )
-                    )
-                    is_ok = False
-            for value in node.values:
-                if isinstance(value, ast.Call):
-                    description = value.args[1]
-                    if not isinstance(description, ast.Constant):
-                        self._errors.append(
-                            self.Error(
-                                message=self._error_msg.format(
-                                    type="description", value=type(description)
-                                ),
-                                file=file,
-                                line_number=value.lineno,
-                            )
-                        )
-                        is_ok = False
+        if parameters := self._check_node_type(ast.Dict, node, "parameters", file):
+            is_ok = self._validate_parameter_keys(
+                parameters, file
+            ) and self._validate_parameter_values(parameters, file)
             if is_ok:
-                return list(normalize(node))
+                return list(self.normalize(parameters))
             else:
                 return None
+        return None
 
 
 class ErrorCollector:
@@ -271,6 +301,7 @@ class ErrorCollector:
         self._filename = filename
         self._root = root
         self._validator = Validator()
+        self._errors: List[Error] = []
         self._error_definitions: List[ErrorCodeDetails] = list()
 
     @property
@@ -278,8 +309,8 @@ class ErrorCollector:
         return self._error_definitions
 
     @property
-    def errors(self) -> Iterable["Validator.Error"]:
-        return self._validator.errors
+    def errors(self) -> Iterable[Error]:
+        return self._validator.errors +  self._errors
 
     @property
     def warnings(self) -> Iterable["Validator.Warning"]:
@@ -312,11 +343,18 @@ class ErrorCollector:
                 # stop if we encountered any error
                 return
             if validatation_result.node is None:
-                raise Exception(
-                    "Validation finished with invalid result, but no error was set"
+                import traceback
+                stack_summary = traceback.extract_stack()
+                formatted_traceback = "".join(traceback.format_list(stack_summary))
+                self._errors.append(
+                    Error(code=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.identifier,
+                          message=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.message,
+                          mitigations=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.mitigations,
+                          parameters={"traceback": formatted_traceback})
                 )
-            error_definition = self._make_error(validatation_result.node)
-            self._error_definitions.append(error_definition)
+            else:
+                error_definition = self._make_error(validatation_result.node)
+                self._error_definitions.append(error_definition)
 
 
 def parse_file(file: Union[str, Path, io.TextIOBase]) -> Tuple[

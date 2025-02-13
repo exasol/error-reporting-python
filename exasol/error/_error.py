@@ -12,6 +12,8 @@ from typing import (
     Union,
 )
 
+from exasol.error._internal_errors import LIBRARY_ERRORS, INVALID_ERROR_CODE, UNKNOWN_EXCEPTION_OCCURED
+
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     from exasol_error_reporting_python import exa_error
@@ -100,66 +102,6 @@ class Error:
         return output[:-1]
 
 
-@dataclass(frozen=True)
-class _ExaStaticError:
-    identifier: str
-    message: str
-    messagePlaceholders: List[Dict[str, str]]
-    description: Optional[str]
-    mitigations: List[str]
-    sourceFile: str
-
-    def to_dict(self) -> Dict[str, Any]:
-        ret_val = dataclasses.asdict(self)
-        if self.description is None:
-            del ret_val["description"]
-        return ret_val
-
-
-# ATTENTION: In the event of an exception while creating an error, we encounter a chicken-and-egg problem regarding error definitions.
-# Therefore, errors created by this library must be defined "statically" within this file.
-# Details should then be used to create a low-level error. The information should also be used to create/update the error-codes.json
-# as part of the release preparation. This is only necessary for this library, as it is the root, other libraries should use
-# the `ec` command-line tool to update and create their project specifc error-codes.json file.
-LIBRARY_ERRORS = {
-    "E-ERP-1": _ExaStaticError(
-        identifier="E-ERP-1",
-        message="Invalid error code {{code}}.",
-        messagePlaceholders=[
-            {
-                "placeholder": "code",
-                "description": "Error code which was causing the error.",
-            }
-        ],
-        description=None,
-        mitigations=["Ensure you follow the standard error code format."],
-        sourceFile=Path(__file__).name,
-    ),
-    "E-ERP-2": _ExaStaticError(
-        identifier="E-ERP-2",
-        message="Unknown error/exception occurred.",
-        messagePlaceholders=[
-            {
-                "placeholder": "traceback",
-                "description": "Exception traceback which lead to the generation of this error.",
-            }
-        ],
-        description="An unexpected error occurred during the creation of the error",
-        mitigations=[
-            cleandoc(
-                """
-                    A good starting point would be to investigate the cause of the attached exception.
-        
-                    Trackback:
-                        {{traceback}}
-                    """
-            )
-        ],
-        sourceFile=Path(__file__).name,
-    ),
-}
-
-
 def ExaError(
     code: str,
     message: str,
@@ -183,12 +125,10 @@ def ExaError(
     try:
         return Error(code, message, mitigations, parameters)
     except InvalidErrorCode:
-        error_code = "E-ERP-1"
-        error_details = LIBRARY_ERRORS[error_code]
         return Error(
-            code=error_details.identifier,
-            message=error_details.message,
-            mitigations=error_details.mitigations,
+            code=INVALID_ERROR_CODE.identifier,
+            message=INVALID_ERROR_CODE.message,
+            mitigations=INVALID_ERROR_CODE.mitigations,
             parameters={"code": code},
         )
     except Exception as ex:
@@ -196,12 +136,10 @@ def ExaError(
 
         tb = traceback.format_exc()
         parameters = {"traceback": tb}
-        error_code = "E-ERP-2"
-        error_details = LIBRARY_ERRORS[error_code]
         return Error(
-            code=error_details.identifier,
-            message=error_details.message,
-            mitigations=error_details.mitigations,
+            code=UNKNOWN_EXCEPTION_OCCURED.identifier,
+            message=UNKNOWN_EXCEPTION_OCCURED.message,
+            mitigations=UNKNOWN_EXCEPTION_OCCURED.mitigations,
             parameters=parameters,
         )
 
@@ -214,7 +152,7 @@ def _create_error_code_definitions(version=None) -> Dict[str, Any]:
         "$schema": "https://schemas.exasol.com/error_code_report-1.0.0.json",
         "projectName": "exasol-error-reporting",
         "projectVersion": version,
-        "errorCodes": [code.to_dict() for code in LIBRARY_ERRORS.values()],
+        "errorCodes": [code.to_dict() for code in LIBRARY_ERRORS],
     }
 
 

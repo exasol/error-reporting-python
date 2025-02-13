@@ -4,6 +4,8 @@ from inspect import cleandoc
 
 import pytest
 
+from exasol.error._error import Error
+from exasol.error._internal_errors import INVALID_ERROR_CODE_DEFINITION
 from exasol.error._parse import (
     ErrorCodeDetails,
     ErrorCollector,
@@ -76,10 +78,16 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validator.Error(
-                    message=f"description only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
-                    file="<Unknown>",
-                    line_number=10,
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters = {
+                        "error_element": "description",
+                        "file": "<Unknown>",
+                        "line": 10,
+                        "defined_type":  ast.Name
+                    }
                 )
             ],
         ),
@@ -100,10 +108,16 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validator.Error(
-                    message=f"error-codes only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
-                    file="<Unknown>",
-                    line_number=7,
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters = {
+                        "error_element": "error-codes",
+                        "file": "<Unknown>",
+                        "line": 7,
+                        "defined_type":  ast.Name
+                    }
                 )
             ],
         ),
@@ -124,10 +138,16 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validator.Error(
-                    message=f"mitigations only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
-                    file="<Unknown>",
-                    line_number=9,
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters = {
+                        "error_element": "mitigations",
+                        "file": "<Unknown>",
+                        "line": 9,
+                        "defined_type":  ast.Name
+                    }
                 )
             ],
         ),
@@ -148,12 +168,48 @@ def test_ErrorCollector_error_definitions(src, expected):
                         """
             ),
             [
-                Validator.Error(
-                    message=f"mitigations only can contain constant values, details: <class '{AST_NAME_CLASS}'>",
-                    file="<Unknown>",
-                    line_number=9,
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters = {
+                        "error_element": "mitigations",
+                        "file": "<Unknown>",
+                        "line": 9,
+                        "defined_type":  ast.Name
+                    }
                 )
             ],
+        ),
+            (
+                    cleandoc(
+                        """
+                                from exasol import error
+                                from exasol.error import Parameter
+                
+                                var = input("description: ") 
+                
+                                error1 = error.ExaError(
+                                    "E-TEST-1",
+                                    var,
+                                    ["mitigations"],
+                                    {"param": Parameter("value", "description")},
+                                )
+                                """
+                    ),
+                    [
+                        Error(
+                            code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                            message=INVALID_ERROR_CODE_DEFINITION.message,
+                            mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                            parameters={
+                                "error_element": "message",
+                                "file": "<Unknown>",
+                                "line": 8,
+                                "defined_type": ast.Name
+                            }
+                        )
+                    ],
         ),
     ],
 )
@@ -161,7 +217,18 @@ def test_ErrorCollector_errors(src, expected):
     root_node = ast.parse(src)
     collector = ErrorCollector(root_node)
     collector.collect()
-    assert expected == collector.errors
+    errors = list(collector.errors)
+    assert len(expected) == len(errors)
+
+    for idx_error in range(len(errors)):
+        first_expected = expected[idx_error]
+        first_error = errors[idx_error]
+
+        assert first_error._error._error_code == first_expected._error._error_code
+        assert first_error._error._message_builder == first_expected._error._message_builder
+        assert first_error._error._mitigations == first_expected._error._mitigations
+        assert first_error._error._parameter_dict == first_expected._error._parameter_dict
+
 
 
 @pytest.mark.parametrize(
