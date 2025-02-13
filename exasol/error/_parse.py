@@ -20,8 +20,11 @@ from typing import (
 from mypy.checker import and_conditional_maps
 
 from exasol.error._error import Error
-from exasol.error._internal_errors import LIBRARY_ERRORS, INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG, \
-    INVALID_ERROR_CODE_DEFINITION
+from exasol.error._internal_errors import (
+    INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG,
+    INVALID_ERROR_CODE_DEFINITION,
+    LIBRARY_ERRORS,
+)
 from exasol.error._report import (
     ErrorCodeDetails,
     Placeholder,
@@ -171,10 +174,17 @@ class Validator:
         """
         if not isinstance(node, expected_type):
             self._errors.append(
-                Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
-                      message=INVALID_ERROR_CODE_DEFINITION.message,
-                      mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                      parameters={"error_element": error_attribute, "file": file, "line": node.lineno, "defined_type": type(node)})
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters={
+                        "error_element": error_attribute,
+                        "file": file,
+                        "line": str(node.lineno),
+                        "defined_type": str(type(node)),
+                    },
+                )
             )
             return None
         else:
@@ -195,10 +205,17 @@ class Validator:
         """
         if not isinstance(node, (expected_type_one, expected_type_two)):
             self._errors.append(
-                Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
-                      message=INVALID_ERROR_CODE_DEFINITION.message,
-                      mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                      parameters={"error_element": error_attribute, "file": file, "line": node.lineno, "defined_type": type(node)})
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters={
+                        "error_element": error_attribute,
+                        "file": file,
+                        "line": str(node.lineno),
+                        "defined_type": str(type(node)),
+                    },
+                )
             )
             return None
         else:
@@ -226,10 +243,17 @@ class Validator:
                 ]
                 self._errors.extend(
                     [
-                        Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
-                              message=INVALID_ERROR_CODE_DEFINITION.message,
-                              mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                              parameters={"error_element": "mitigations", "file": file, "line": node.lineno, "defined_type": type(e)})
+                        Error(
+                            code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                            message=INVALID_ERROR_CODE_DEFINITION.message,
+                            mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                            parameters={
+                                "error_element": "mitigations",
+                                "file": file,
+                                "line": str(node.lineno),
+                                "defined_type": str(type(e)),
+                            },
+                        )
                         for e in invalid
                     ]
                 )
@@ -253,24 +277,29 @@ class Validator:
     def _validate_parameter_keys(self, parameter_node: ast.Dict, file: str):
         ret_val = True
         for key in parameter_node.keys:
+            # The type of ast.Dict.keys is List[Optional[ast.expr]], not List[ast.expr] as someone would expect.
+            # However, trying unit tests with parameters of kind {None: "something"} did not provoke the "key" to be None.
+            # Nevertheless, keep the following error handling, in case of some strange corner case resulting "key" to be None.
             if key is None:
                 self._errors.append(
-                    Error(code=INVALID_ERROR_CODE_DEFINITION.identifier,
-                          message=INVALID_ERROR_CODE_DEFINITION.message,
-                          mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                          parameters={"error_element": "parameter keys", "file": file, "line": parameter_node.lineno,
-                                      "defined_type": "NoneType"})
+                    Error(
+                        code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                        message=INVALID_ERROR_CODE_DEFINITION.message,
+                        mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                        parameters={
+                            "error_element": "parameter keys",
+                            "file": file,
+                            "line": str(parameter_node.lineno),
+                            "defined_type": "NoneType",
+                        },
+                    )
                 )
                 ret_val = False
-            elif not self._check_node_type(
-                ast.Constant, key, "key", file
-            ):
+            elif not self._check_node_type(ast.Constant, key, "key", file):
                 ret_val = False
         return ret_val
 
-    def _validate_parameter_values(
-        self, pparameter_node: ast.Dict, file: str
-    ) -> bool:
+    def _validate_parameter_values(self, pparameter_node: ast.Dict, file: str) -> bool:
         ret_val = True
         for value in pparameter_node.values:
             if isinstance(value, ast.Call):
@@ -310,7 +339,7 @@ class ErrorCollector:
 
     @property
     def errors(self) -> Iterable[Error]:
-        return self._validator.errors +  self._errors
+        return list(self._validator.errors) + self._errors
 
     @property
     def warnings(self) -> Iterable["Validator.Warning"]:
@@ -344,13 +373,16 @@ class ErrorCollector:
                 return
             if validatation_result.node is None:
                 import traceback
+
                 stack_summary = traceback.extract_stack()
                 formatted_traceback = "".join(traceback.format_list(stack_summary))
                 self._errors.append(
-                    Error(code=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.identifier,
-                          message=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.message,
-                          mitigations=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.mitigations,
-                          parameters={"traceback": formatted_traceback})
+                    Error(
+                        code=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.identifier,
+                        message=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.message,
+                        mitigations=INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG.mitigations,
+                        parameters={"traceback": formatted_traceback},
+                    )
                 )
             else:
                 error_definition = self._make_error(validatation_result.node)
@@ -360,7 +392,7 @@ class ErrorCollector:
 def parse_file(file: Union[str, Path, io.TextIOBase]) -> Tuple[
     Iterable[ErrorCodeDetails],
     Iterable["Validator.Warning"],
-    Iterable["Validator.Error"],
+    Iterable[Error],
 ]:
     with ExitStack() as stack:
         f = file if isinstance(file, io.TextIOBase) else stack.enter_context(open(file))

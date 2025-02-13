@@ -12,7 +12,11 @@ from typing import (
     Union,
 )
 
-from exasol.error._internal_errors import LIBRARY_ERRORS, INVALID_ERROR_CODE, UNKNOWN_EXCEPTION_OCCURED
+from exasol.error._internal_errors import (
+    INVALID_ERROR_CODE,
+    LIBRARY_ERRORS,
+    UNKNOWN_EXCEPTION_OCCURED,
+)
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -152,7 +156,7 @@ def _create_error_code_definitions(version=None) -> Dict[str, Any]:
         "$schema": "https://schemas.exasol.com/error_code_report-1.0.0.json",
         "projectName": "exasol-error-reporting",
         "projectVersion": version,
-        "errorCodes": [code.to_dict() for code in LIBRARY_ERRORS],
+        "errorCodes": [code.to_dict() for code in list(LIBRARY_ERRORS)],
     }
 
 

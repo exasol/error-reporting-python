@@ -23,7 +23,7 @@ AST_NAME_CLASS = "ast.Name" if sys.version_info.minor > 8 else "_ast.Name"
             cleandoc(
                 """
                         from exasol import error
-                        
+
                         error1 = error.ExaError(
                             "E-TEST-1",
                             "this is an error",
@@ -66,9 +66,9 @@ def test_ErrorCollector_error_definitions(src, expected):
                 """
                         from exasol import error
                         from exasol.error import Parameter
-        
-                        var = input("description: ") 
-        
+
+                        var = input("description: ")
+
                         error1 = error.ExaError(
                             "E-TEST-1",
                             "this is an error",
@@ -82,12 +82,12 @@ def test_ErrorCollector_error_definitions(src, expected):
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
                     message=INVALID_ERROR_CODE_DEFINITION.message,
                     mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                    parameters = {
+                    parameters={
                         "error_element": "description",
                         "file": "<Unknown>",
-                        "line": 10,
-                        "defined_type":  ast.Name
-                    }
+                        "line": "10",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
                 )
             ],
         ),
@@ -96,9 +96,9 @@ def test_ErrorCollector_error_definitions(src, expected):
                 """
                         from exasol import error
                         from exasol.error import Parameter
-        
-                        var = input("description: ") 
-        
+
+                        var = input("description: ")
+
                         error1 = error.ExaError(
                             var,
                             "this is an error",
@@ -112,12 +112,12 @@ def test_ErrorCollector_error_definitions(src, expected):
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
                     message=INVALID_ERROR_CODE_DEFINITION.message,
                     mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                    parameters = {
+                    parameters={
                         "error_element": "error-codes",
                         "file": "<Unknown>",
-                        "line": 7,
-                        "defined_type":  ast.Name
-                    }
+                        "line": "7",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
                 )
             ],
         ),
@@ -126,9 +126,9 @@ def test_ErrorCollector_error_definitions(src, expected):
                 """
                         from exasol import error
                         from exasol.error import Parameter
-        
-                        var = input("description: ") 
-        
+
+                        var = input("description: ")
+
                         error1 = error.ExaError(
                             "E-TEST-1",
                             "this is an error",
@@ -142,12 +142,12 @@ def test_ErrorCollector_error_definitions(src, expected):
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
                     message=INVALID_ERROR_CODE_DEFINITION.message,
                     mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                    parameters = {
+                    parameters={
                         "error_element": "mitigations",
                         "file": "<Unknown>",
-                        "line": 9,
-                        "defined_type":  ast.Name
-                    }
+                        "line": "9",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
                 )
             ],
         ),
@@ -156,9 +156,9 @@ def test_ErrorCollector_error_definitions(src, expected):
                 """
                         from exasol import error
                         from exasol.error import Parameter
-        
-                        var = input("description: ") 
-        
+
+                        var = input("description: ")
+
                         error1 = error.ExaError(
                             "E-TEST-1",
                             "this is an error",
@@ -172,23 +172,23 @@ def test_ErrorCollector_error_definitions(src, expected):
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
                     message=INVALID_ERROR_CODE_DEFINITION.message,
                     mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                    parameters = {
+                    parameters={
                         "error_element": "mitigations",
                         "file": "<Unknown>",
-                        "line": 9,
-                        "defined_type":  ast.Name
-                    }
+                        "line": "9",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
                 )
             ],
         ),
-            (
-                    cleandoc(
-                        """
+        (
+            cleandoc(
+                """
                                 from exasol import error
                                 from exasol.error import Parameter
-                
-                                var = input("description: ") 
-                
+
+                                var = input("description: ")
+
                                 error1 = error.ExaError(
                                     "E-TEST-1",
                                     var,
@@ -196,20 +196,20 @@ def test_ErrorCollector_error_definitions(src, expected):
                                     {"param": Parameter("value", "description")},
                                 )
                                 """
-                    ),
-                    [
-                        Error(
-                            code=INVALID_ERROR_CODE_DEFINITION.identifier,
-                            message=INVALID_ERROR_CODE_DEFINITION.message,
-                            mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                            parameters={
-                                "error_element": "message",
-                                "file": "<Unknown>",
-                                "line": 8,
-                                "defined_type": ast.Name
-                            }
-                        )
-                    ],
+            ),
+            [
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters={
+                        "error_element": "message",
+                        "file": "<Unknown>",
+                        "line": "8",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
+                )
+            ],
         ),
     ],
 )
@@ -225,10 +225,14 @@ def test_ErrorCollector_errors(src, expected):
         first_error = errors[idx_error]
 
         assert first_error._error._error_code == first_expected._error._error_code
-        assert first_error._error._message_builder == first_expected._error._message_builder
+        assert (
+            first_error._error._message_builder
+            == first_expected._error._message_builder
+        )
         assert first_error._error._mitigations == first_expected._error._mitigations
-        assert first_error._error._parameter_dict == first_expected._error._parameter_dict
-
+        assert (
+            first_error._error._parameter_dict == first_expected._error._parameter_dict
+        )
 
 
 @pytest.mark.parametrize(
