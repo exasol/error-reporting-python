@@ -3,7 +3,10 @@ from inspect import cleandoc
 
 import pytest
 
-from exasol.error._parse import parse_file, Validator
+from exasol.error._parse import (
+    Validator,
+    parse_file,
+)
 from exasol.error._report import ErrorCodeDetails
 
 
@@ -12,7 +15,7 @@ from exasol.error._report import ErrorCodeDetails
     [
         ("'str mitigation'", ["str mitigation"]),
         ("42", [42]),
-        ("""['mitigation a', 42.5]""",['mitigation a', 42.5]),
+        ("""['mitigation a', 42.5]""", ["mitigation a", 42.5]),
     ],
 )
 def test_mitigation_values(mitigation_str, mitigation):
@@ -80,7 +83,13 @@ def test_mitigation_none_constant_fails():
 
     expected_definitions = []
     expected_warnings = []
-    expected_errors = [Validator.Error(message="mitigations only can contain constant values, details: <class 'ast.BinOp'>", file='<StringIO>', line_number=10)]
+    expected_errors = [
+        Validator.Error(
+            message="mitigations only can contain constant values, details: <class 'ast.BinOp'>",
+            file="<StringIO>",
+            line_number=10,
+        )
+    ]
 
     definitions, warnings, errors = parse_file(f)
 

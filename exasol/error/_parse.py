@@ -4,7 +4,6 @@ from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
-    Any,
     Dict,
     Generator,
     Iterable,
@@ -49,7 +48,7 @@ class _ExaErrorNodeWalker:
 
 
 def _extract_attributes(node: ast.Call) -> _ExaErrorAttributes:
-    kwargs: Dict[str, Any] = {}
+    kwargs: Dict[str, ast.expr] = {}
     params = ["code", "message", "mitigations", "parameters"]
 
     for arg in node.args:
@@ -82,10 +81,10 @@ class Validator:
 
     @dataclass(frozen=True)
     class ExaValidatedNode:
-        code: ast.Constant
-        message: ast.Constant
-        mitigations: Union[ast.Constant, ast.List]
-        parameters: ast.Dict
+        code: str
+        message: str
+        mitigations: List[str]
+        parameters: List[Tuple[str, str]]
         lineno: int
 
     @dataclass(frozen=True)
@@ -126,10 +125,19 @@ class Validator:
         # make sure all parameters have the valid type
         code_validated = self._validate_code(error_attributes.code, file)
         message_validated = self._validate_message(error_attributes.message, file)
-        mitigations_validated = self._validate_mitigations(error_attributes.mitigations, file)
-        parameters_validated = self._validate_parameters(error_attributes.parameters, file)
+        mitigations_validated = self._validate_mitigations(
+            error_attributes.mitigations, file
+        )
+        parameters_validated = self._validate_parameters(
+            error_attributes.parameters, file
+        )
         validated_node = None
-        if code_validated and message_validated and mitigations_validated and parameters_validated:
+        if (
+            code_validated is not None
+            and message_validated is not None
+            and mitigations_validated is not None
+            and parameters_validated is not None
+        ):
             validated_node = Validator.ExaValidatedNode(
                 code=code_validated,
                 message=message_validated,
@@ -144,7 +152,7 @@ class Validator:
             node=validated_node,
         )
 
-    def _validate_code(self, code: ast.expr, file: str) -> Optional[ast.Constant]:
+    def _validate_code(self, code: ast.expr, file: str) -> Optional[str]:
         if not isinstance(code, ast.Constant):
             self._errors.append(
                 self.Error(
@@ -157,9 +165,9 @@ class Validator:
             )
             return None
         else:
-            return code
+            return code.value
 
-    def _validate_message(self, node: ast.expr, file: str) -> Optional[ast.Constant]:
+    def _validate_message(self, node: ast.expr, file: str) -> Optional[str]:
         if not isinstance(node, ast.Constant):
             self._errors.append(
                 self.Error(
@@ -170,11 +178,9 @@ class Validator:
             )
             return None
         else:
-            return node
+            return node.value
 
-    def _validate_mitigations(
-        self, node: ast.expr, file: str
-    ) -> Union[ast.Constant, ast.List, None]:
+    def _validate_mitigations(self, node: ast.expr, file: str) -> Optional[List[str]]:
         if not isinstance(node, ast.List) and not isinstance(node, ast.Constant):
             self._errors.append(
                 self.Error(
@@ -203,12 +209,21 @@ class Validator:
             if invalid:
                 return None
             else:
-                return node
+                return [e.value for e in node.elts if isinstance(e, ast.Constant)]
         elif isinstance(node, ast.Constant):
-            return node
+            return [node.value]
         return None
 
-    def _validate_parameters(self, node: ast.expr, file: str) -> Optional[ast.Dict]:
+    def _validate_parameters(
+        self, node: ast.expr, file: str
+    ) -> Optional[List[Tuple[str, str]]]:
+        def normalize(params):
+            for k, v in zip(params.keys, params.keys):
+                if isinstance(v, ast.Call):
+                    yield k.value, v[1]
+                else:
+                    yield k.value, ""
+
         if not isinstance(node, ast.Dict):
             self._errors.append(
                 self.Error(
@@ -246,7 +261,7 @@ class Validator:
                         )
                         is_ok = False
             if is_ok:
-                return node
+                return list(normalize(node))
             else:
                 return None
 
@@ -270,41 +285,21 @@ class ErrorCollector:
     def warnings(self) -> Iterable["Validator.Warning"]:
         return self._validator.warnings
 
-    def _construct_mitigations(self, code: ast.Constant, mitigations: Union[ast.Constant, ast.List]):
-        if isinstance(mitigations, ast.Constant):
-            return [mitigations.value]
-        if isinstance(mitigations, ast.List):
-            mitigation_values = [m.value for m in mitigations.elts if isinstance(m, ast.Constant)]
-            if len(mitigation_values) != len(mitigations.elts):
-                raise Exception(f"Internal error: validation not correct for '{code}'. Not all elements in list are constants.")
-            return mitigation_values
-        else:
-            raise Exception(f"Internal error: validation not correct for '{code}' Invalid type.")
-
     def _make_error(
         self, validated_node: Validator.ExaValidatedNode
     ) -> ErrorCodeDetails:
 
-        def normalize(params):
-            for k, v in zip(params.keys, params.keys):
-                if isinstance(v, ast.Call):
-                    yield k.value, v[1]
-                else:
-                    yield k.value, ""
-
         return ErrorCodeDetails(
-            identifier=validated_node.code.value,
-            message=validated_node.message.value,
+            identifier=validated_node.code,
+            message=validated_node.message,
             messagePlaceholders=[
                 Placeholder(name, description)
-                for name, description in normalize(
-                    validated_node.parameters
-                )
+                for name, description in validated_node.parameters
             ],
             description=None,
             internalDescription=None,
             potentialCauses=None,
-            mitigations=self._construct_mitigations(validated_node.code, validated_node.mitigations),
+            mitigations=validated_node.mitigations,
             sourceFile=self._filename,
             sourceLine=validated_node.lineno,
             contextHash=None,
@@ -312,14 +307,14 @@ class ErrorCollector:
 
     def collect(self) -> None:
         for node in _ExaErrorNodeWalker(self._root):
-            validatation_result = self._validator.validate(
-                node, self._filename
-            )
+            validatation_result = self._validator.validate(node, self._filename)
             if validatation_result.errors:
                 # stop if we encountered any error
                 return
-            if  validatation_result.node is None:
-                raise Exception("Validation finished with invalid result, but no error was set")
+            if validatation_result.node is None:
+                raise Exception(
+                    "Validation finished with invalid result, but no error was set"
+                )
             error_definition = self._make_error(validatation_result.node)
             self._error_definitions.append(error_definition)
 
