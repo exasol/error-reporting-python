@@ -1,10 +1,8 @@
 import ast
 import io
-import traceback
 from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
-from types import NoneType
 from typing import (
     Dict,
     Generator,
@@ -12,18 +10,14 @@ from typing import (
     List,
     Optional,
     Tuple,
-    Type,
     TypeVar,
     Union,
 )
-
-from mypy.checker import and_conditional_maps
 
 from exasol.error._error import Error
 from exasol.error._internal_errors import (
     INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG,
     INVALID_ERROR_CODE_DEFINITION,
-    LIBRARY_ERRORS,
 )
 from exasol.error._report import (
     ErrorCodeDetails,
@@ -101,8 +95,8 @@ class Validator:
         node: Optional["Validator.ExaValidatedNode"]
 
     def __init__(self) -> None:
-        self._warnings: List["Validator.Warning"] = list()
-        self._errors: List[Error] = list()
+        self._warnings: List["Validator.Warning"] = []
+        self._errors: List[Error] = []
 
     @property
     def errors(self) -> Iterable[Error]:
@@ -187,8 +181,7 @@ class Validator:
                 )
             )
             return None
-        else:
-            return node
+        return node
 
     def _check_node_types(
         self,
@@ -218,20 +211,17 @@ class Validator:
                 )
             )
             return None
-        else:
-            return node
+        return node
 
     def _validate_code(self, node: ast.expr, file: str) -> Optional[str]:
         if code := self._check_node_type(ast.Constant, node, "error-codes", file):
             return code.value
-        else:
-            return None
+        return None
 
     def _validate_message(self, node: ast.expr, file: str) -> Optional[str]:
         if message := self._check_node_type(ast.Constant, node, "message", file):
             return message.value
-        else:
-            return None
+        return None
 
     def _validate_mitigations(self, node: ast.expr, file: str) -> Optional[List[str]]:
         if mitigation := self._check_node_types(
@@ -320,8 +310,7 @@ class Validator:
             ) and self._validate_parameter_values(parameters, file)
             if is_ok:
                 return list(self.normalize(parameters))
-            else:
-                return None
+            return None
         return None
 
 
@@ -331,7 +320,7 @@ class ErrorCollector:
         self._root = root
         self._validator = Validator()
         self._errors: List[Error] = []
-        self._error_definitions: List[ErrorCodeDetails] = list()
+        self._error_definitions: List[ErrorCodeDetails] = []
 
     @property
     def error_definitions(self) -> List[ErrorCodeDetails]:

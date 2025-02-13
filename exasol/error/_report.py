@@ -13,10 +13,10 @@ from typing import (
 class JsonEncoder(json.JSONEncoder):
     """Json encoder with dataclass support"""
 
-    def default(self, obj):
-        if is_dataclass(obj):
-            return asdict(obj)
-        return super().default(obj)
+    def default(self, o):
+        if is_dataclass(o):
+            return asdict(o)
+        return super().default(o)
 
 
 @dataclass(frozen=True)
