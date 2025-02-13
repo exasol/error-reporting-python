@@ -69,8 +69,7 @@ UNKNOWN_EXCEPTION_OCCURED = _ExaStaticError(
     mitigations=[
         cleandoc(
             """
-            A good starting point would be to investigate 
-            the cause of the attached exception.
+            A good starting point would be to investigate the cause of the attached exception.
 
             Trackback:
                 {{traceback}}
@@ -101,12 +100,12 @@ INVALID_ERROR_CODE_DEFINITION = _ExaStaticError(
     mitigations=[
         cleandoc(
             """
-                    Check the definition of ExaError. Possible errors: 
-                    1. Usage of none-constant expression in error code, message
-                    2. Mitigations are not a list, but another container
-                    3. Invalid definition of parameters.
+            Check the definition of ExaError. Possible errors: 
+            1. Usage of none-constant expression in error code, message
+            2. Mitigations are not a list, but another container
+            3. Invalid definition of parameters.
 
-                    """
+            """
         )
     ],
     sourceFile=Path(__file__).name,
@@ -125,8 +124,8 @@ INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG = _ExaStaticError(
     mitigations=[
         cleandoc(
             """
-                Open a bug ticket at 
-                https://github.com/exasol/error-reporting-python/issues/new?template=bug.md
+            Open a bug ticket at 
+            https://github.com/exasol/error-reporting-python/issues/new?template=bug.md
             """
         )
     ],
