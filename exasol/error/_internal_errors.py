@@ -81,10 +81,12 @@ UNKNOWN_EXCEPTION_OCCURED = _ExaStaticError(
 
 INVALID_ERROR_CODE_DEFINITION = _ExaStaticError(
     identifier="E-ERP-3",
-    message="Invalid error code definition: {{error_element}} "
-    "only can contain constant values, "
-    "but is of type: {{defined_type}}. "
-    "In file {{file}} line {{line}}",
+    message=(
+        "Invalid error code definition: {{error_element}} "
+        "only can contain constant values, "
+        "but is of type: {{defined_type}}. "
+        "In file {{file}} line {{line}}"
+    ),
     messagePlaceholders=[
         {
             "error_element": "The element within the error "
