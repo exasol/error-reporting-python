@@ -193,7 +193,7 @@ class Validator:
     ) -> Optional[NodeType]:
         """
         This function validates if the given AST node ('node')  matches type 'expected_type_one' or 'expected_type_two'.
-        If it matches, then it returns it as type Union[expected_type_one, expected_type_two],
+        If it matches, then it returns it as type `expected_type_one` or `expected_type_two`,
         otherwise it adds it to the internal error list and return None.
         """
         if not isinstance(node, (expected_type_one, expected_type_two)):
@@ -264,7 +264,11 @@ class Validator:
             else:
                 yield k.value, ""
 
-    def _validate_parameter_keys(self, parameter_node: ast.Dict, file: str):
+    def _validate_parameter_keys(self, parameter_node: ast.Dict, file: str) -> bool:
+        """
+        Checks if keys of ast dictionary are of expected type.
+        If the keys are of expected type, the method returns True, otherwise False.
+        """
         ret_val = True
         for key in parameter_node.keys:
             # The type of ast.Dict.keys is List[Optional[ast.expr]], not List[ast.expr] as someone would expect.
@@ -289,9 +293,14 @@ class Validator:
                 ret_val = False
         return ret_val
 
-    def _validate_parameter_values(self, pparameter_node: ast.Dict, file: str) -> bool:
+    def _validate_parameter_values(self, parameter_node: ast.Dict, file: str) -> bool:
+        """
+        Checks if value of ast dictionary are of expected type.
+        If the values are of expected type, the method returns True, otherwise False.
+        """
+
         ret_val = True
-        for value in pparameter_node.values:
+        for value in parameter_node.values:
             if isinstance(value, ast.Call):
                 description = value.args[1]
                 if not self._check_node_type(
