@@ -1,4 +1,9 @@
-from typing import Any
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+)
 
 from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
 
@@ -9,14 +14,16 @@ class ParametersMapper:
     placeholders in messages.
     """
 
-    def __init__(self, text: str, arguments: str):
+    def __init__(self, text: str, arguments: List[str]) -> None:
         self._text = text
         self._parameters = arguments
         self._parameter_idx = 0
-        self._parameter_dict = {}
+        self._parameter_dict: Dict[str, Optional[str]] = {}
 
     @classmethod
-    def get_params_dict(cls, text, arguments) -> dict:
+    def get_params_dict(
+        cls, text: str, arguments: List[str]
+    ) -> Dict[str, Optional[str]]:
         """
         Create ParametersMapper object and return the generated dictionary
         that maps the placeholders and parameters.
@@ -31,7 +38,7 @@ class ParametersMapper:
         parameters_mapper._map_parameters()
         return parameters_mapper._parameter_dict
 
-    def _map_parameters(self):
+    def _map_parameters(self) -> None:
         """
         Parse the given text containing placeholders, look up the positional
         parameters and set the correct parameter mapping.
@@ -39,10 +46,11 @@ class ParametersMapper:
 
         for placeholder in PlaceholderHandler.get_placeholders(self._text):
             if self._is_parameter_present():
-                self._parameter_dict[placeholder.name] = self._get_current_parameter()
+                current_parameter = self._get_current_parameter()
+                self._parameter_dict[placeholder.name] = current_parameter
             self._next_parameters()
 
-    def _get_current_parameter(self) -> Any:
+    def _get_current_parameter(self) -> Optional[str]:
         """
         Return the current parameter, if any.
 
@@ -60,7 +68,7 @@ class ParametersMapper:
 
         :return: True if present, False otherwise
         """
-        return self._parameters and self._parameter_idx < len(self._parameters)
+        return len(self._parameters) > 0 and self._parameter_idx < len(self._parameters)
 
     def _next_parameters(self):
         """
