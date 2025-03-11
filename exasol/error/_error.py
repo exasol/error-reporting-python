@@ -8,13 +8,12 @@ from typing import (
     Union,
 )
 
+from exasol.error import exa_error
 from exasol.error._internal_errors import (
     INVALID_ERROR_CODE,
     LIBRARY_ERRORS,
     UNKNOWN_EXCEPTION_OCCURED,
 )
-
-from exasol.error import exa_error
 from exasol.error.error_message_builder import (
     ErrorMessageBuilder,
     InvalidErrorCode,
