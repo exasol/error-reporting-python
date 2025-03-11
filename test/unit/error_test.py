@@ -114,7 +114,7 @@ def test_exa_error_does_not_throw_error_on_invalid(data):
 def test_raising_message_builder(data):
     from unittest.mock import patch
 
-    from exasol.error.exa_error import ExaError as Error
+    from exasol.error._exa_error import ExaError as Error
 
     actual_impl = Error.message_builder
 

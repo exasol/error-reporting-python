@@ -1,4 +1,4 @@
-from exasol.error.exa_error import ExaError
+from exasol.error._exa_error import ExaError
 
 
 def test_message_builder():

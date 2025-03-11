@@ -5,7 +5,7 @@ from typing import (
     Optional,
 )
 
-from exasol.error.placeholder_handler import PlaceholderHandler
+from exasol.error._placeholder_handler import PlaceholderHandler
 
 
 class ParametersMapper:

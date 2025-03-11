@@ -2,7 +2,7 @@ import unittest
 
 import pytest
 
-from exasol.error.error_message_builder import (
+from exasol.error._error_message_builder import (
     ErrorMessageBuilder,
     InvalidErrorCode,
 )
