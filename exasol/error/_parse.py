@@ -7,11 +7,12 @@ from typing import (
     Dict,
     Generator,
     Iterable,
+    Iterator,
     List,
     Optional,
     Tuple,
     TypeVar,
-    Union, Iterator,
+    Union,
 )
 
 from exasol.error._error import Error
