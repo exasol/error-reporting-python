@@ -4,7 +4,7 @@ from typing import (
     Iterable,
 )
 
-from exasol.error.placeholder import Placeholder
+from exasol.error._placeholder import Placeholder
 
 
 class PlaceholderHandler:

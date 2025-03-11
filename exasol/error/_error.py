@@ -9,14 +9,14 @@ from typing import (
 )
 
 from exasol.error import _exa_error
+from exasol.error._error_message_builder import (
+    ErrorMessageBuilder,
+    InvalidErrorCode,
+)
 from exasol.error._internal_errors import (
     INVALID_ERROR_CODE,
     LIBRARY_ERRORS,
     UNKNOWN_EXCEPTION_OCCURED,
-)
-from exasol.error._error_message_builder import (
-    ErrorMessageBuilder,
-    InvalidErrorCode,
 )
 
 
@@ -36,7 +36,7 @@ class Error:
     ) -> None:
         # This function maybe flattened into or moved out of the constructor in the future.
         def build_error(code, msg, mitigations, params) -> ErrorMessageBuilder:
-            builder = exa_error.ExaError.message_builder(code)
+            builder = _exa_error.ExaError.message_builder(code)
             builder.message(msg)
 
             for mitigation in mitigations:
