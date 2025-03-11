@@ -11,7 +11,7 @@ from typing import (
     Optional,
     Tuple,
     TypeVar,
-    Union,
+    Union, Iterator,
 )
 
 from exasol.error._error import Error
@@ -257,10 +257,10 @@ class Validator:
                 return [mitigation.value]
         return None
 
-    def normalize(self, params):
-        for k, v in zip(params.keys, params.keys):
+    def normalize(self, params: ast.Dict) -> Iterator[Tuple[str, str]]:
+        for k, v in zip(params.keys, params.values):
             if isinstance(v, ast.Call):
-                yield k.value, v[1]
+                yield k.value, v.args[1].value
             else:
                 yield k.value, ""
 
