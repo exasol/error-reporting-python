@@ -12,3 +12,4 @@
 ## Refactoring
 
  - #52: Enabled Type Checking for the Project
+ - #63: Removed legacy module

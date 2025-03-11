@@ -1,8 +1,7 @@
 [tool.poetry]
 name = "exasol-error-reporting"
 packages  = [
-    {include = "exasol"},
-    {include = "exasol_error_reporting_python"}
+    {include = "exasol"}
 ]
 version = "0.5.0"
 description = "Exasol Python Error Reporting"
@@ -42,8 +41,7 @@ ec = 'exasol.error._cli:main'
 [tool.coverage.run]
 relative_files = true
 source = [
-    "exasol",
-    "exasol_error_reporting_python",
+    "exasol"
 ]
 
 [tool.coverage.report]
