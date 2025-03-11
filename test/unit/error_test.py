@@ -123,7 +123,7 @@ def test_raising_message_builder(data):
             return actual_impl(error_code)
         raise Exception(f"{error_code}")
 
-    with patch("exasol.error.exa_error.ExaError") as mock:
+    with patch("exasol.error._exa_error.ExaError") as mock:
         mock.message_builder = builder
         error = ExaError(data.code, data.message, data.mitigations, data.parameters)
     actual = str(error)
