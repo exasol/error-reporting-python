@@ -135,4 +135,3 @@ def test_raising_message_builder(data):
     """
     )
     assert expected in actual
-
