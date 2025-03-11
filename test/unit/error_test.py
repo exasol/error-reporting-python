@@ -123,7 +123,7 @@ def test_raising_message_builder(data):
             return actual_impl(error_code)
         raise Exception(f"{error_code}")
 
-    with patch("exasol_error_reporting_python.exa_error.ExaError") as mock:
+    with patch("exasol.error.exa_error.ExaError") as mock:
         mock.message_builder = builder
         error = ExaError(data.code, data.message, data.mitigations, data.parameters)
     actual = str(error)
@@ -136,11 +136,3 @@ def test_raising_message_builder(data):
     )
     assert expected in actual
 
-
-def test_using_the_old_api_produces_deprecation_warning():
-    with pytest.warns(DeprecationWarning):
-        # due to the fact that the exasol.error package already imports the package at an earlier stage
-        # we need to ensure the module is imported during the test itself.
-        import exasol_error_reporting_python
-
-        importlib.reload(exasol_error_reporting_python)
