@@ -1,4 +1,3 @@
-import warnings
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -9,19 +8,16 @@ from typing import (
     Union,
 )
 
+from exasol.error import _exa_error
+from exasol.error._error_message_builder import (
+    ErrorMessageBuilder,
+    InvalidErrorCode,
+)
 from exasol.error._internal_errors import (
     INVALID_ERROR_CODE,
     LIBRARY_ERRORS,
     UNKNOWN_EXCEPTION_OCCURED,
 )
-
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from exasol_error_reporting_python import exa_error
-    from exasol_error_reporting_python.error_message_builder import (
-        ErrorMessageBuilder,
-        InvalidErrorCode,
-    )
 
 
 @dataclass(frozen=True)
@@ -40,7 +36,7 @@ class Error:
     ) -> None:
         # This function maybe flattened into or moved out of the constructor in the future.
         def build_error(code, msg, mitigations, params) -> ErrorMessageBuilder:
-            builder = exa_error.ExaError.message_builder(code)
+            builder = _exa_error.ExaError.message_builder(code)
             builder.message(msg)
 
             for mitigation in mitigations:

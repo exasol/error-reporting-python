@@ -6,8 +6,8 @@ from typing import (
     Optional,
 )
 
-from exasol_error_reporting_python.parameters_mapper import ParametersMapper
-from exasol_error_reporting_python.placeholder_handler import PlaceholderHandler
+from exasol.error._parameters_mapper import ParametersMapper
+from exasol.error._placeholder_handler import PlaceholderHandler
 
 ERROR_CODE_FORMAT = "^[FEW]-[A-Z][A-Z0-9]+(-[A-Z][A-Z0-9]+)*-[0-9]+$"
 
