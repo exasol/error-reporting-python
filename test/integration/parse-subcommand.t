@@ -25,7 +25,7 @@ Test module entry point
       "messagePlaceholders": [
           {
               "placeholder": "param",
-              "description": ""
+              "description": "some description"
           }
       ],
       "description": null,
@@ -67,7 +67,7 @@ Test cli command
       "messagePlaceholders": [
           {
               "placeholder": "param",
-              "description": ""
+              "description": "some description"
           }
       ],
       "description": null,

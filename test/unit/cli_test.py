@@ -37,7 +37,7 @@ AST_NAME_CLASS = "ast.Name" if sys.version_info.minor > 8 else "_ast.Name"
                     identifier="E-TEST-1",
                     message="this is an error",
                     messagePlaceholders=[
-                        Placeholder(placeholder="param", description="")
+                        Placeholder(placeholder="param", description="description")
                     ],
                     description=None,
                     internalDescription=None,

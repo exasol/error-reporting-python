@@ -34,26 +34,22 @@ class Error:
         mitigations: Union[str, Iterable[str]],
         parameters: Dict[str, Union[str, Parameter]],
     ) -> None:
-        # This function maybe flattened into or moved out of the constructor in the future.
-        def build_error(code, msg, mitigations, params) -> ErrorMessageBuilder:
-            builder = _exa_error.ExaError.message_builder(code)
-            builder.message(msg)
+        builder = _exa_error.ExaError.message_builder(code)
+        builder.message(message)
 
-            for mitigation in mitigations:
-                builder.mitigation(mitigation)
+        for mitigation in mitigations:
+            builder.mitigation(mitigation)
 
-            for k, v in params.items():
-                name = k
-                value = v
-                description: Optional[str] = ""
-                if isinstance(v, Parameter):
-                    value = v.value
-                    description = v.description
-                builder.parameter(name, value, description)
+        for k, v in parameters.items():
+            name = k
+            value = v
+            description: Optional[str] = ""
+            if isinstance(v, Parameter):
+                value = v.value
+                description = v.description
+            builder.parameter(name, value, description)
 
-            return builder
-
-        self._error = build_error(code, message, mitigations, parameters)
+        self._error = builder
 
     def __str__(self) -> str:
         return f"{self._error}"
