@@ -1,4 +1,4 @@
-from exasol_error_reporting_python.error_message_builder import ErrorMessageBuilder
+from exasol.error.error_message_builder import ErrorMessageBuilder
 
 
 class ExaError:

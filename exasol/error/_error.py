@@ -1,4 +1,3 @@
-import warnings
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -15,13 +14,11 @@ from exasol.error._internal_errors import (
     UNKNOWN_EXCEPTION_OCCURED,
 )
 
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from exasol_error_reporting_python import exa_error
-    from exasol_error_reporting_python.error_message_builder import (
-        ErrorMessageBuilder,
-        InvalidErrorCode,
-    )
+from exasol.error import exa_error
+from exasol.error.error_message_builder import (
+    ErrorMessageBuilder,
+    InvalidErrorCode,
+)
 
 
 @dataclass(frozen=True)
