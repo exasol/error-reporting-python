@@ -261,13 +261,15 @@ class Validator:
     def normalize(self, params: ast.Dict) -> Iterator[Tuple[str, str]]:
         for k, v in zip(params.keys, params.values):
             if (
-                isinstance(v, ast.Call)
-                and isinstance(k, ast.Constant)
-                and k.value is not None
-                and isinstance(v.args[1], ast.Constant)
-                and v.args[1].value is not None
+                    isinstance(v, ast.Call)
+                    and isinstance(k, ast.Constant)
+                    and k.value is not None
+                    and isinstance(v.args[1], ast.Constant)
+                    and v.args[1].value is not None
             ):
                 yield k.value, v.args[1].value
+            elif isinstance(k, ast.Constant) and k.value is not None:
+                yield k.value, ""
 
     def _validate_parameter_keys(self, parameter_node: ast.Dict, file: str) -> bool:
         """
