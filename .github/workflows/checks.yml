@@ -18,7 +18,7 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Check Version(s)
         run: |
@@ -36,7 +36,7 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Build Documentation
         run: |
@@ -58,7 +58,7 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Run changelog update check
         run: poetry run -- nox -s changelog:updated
@@ -79,7 +79,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Run lint
         run: poetry run -- nox -s lint:code
@@ -109,7 +109,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Run type-check
         run: poetry run -- nox -s lint:typing
@@ -130,7 +130,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Run security linter
         run: poetry run -- nox -s lint:security
@@ -153,7 +153,7 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Run format check
         run: poetry run -- nox -s project:format
@@ -176,7 +176,7 @@ jobs:
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
           python-version: ${{ matrix.python-version }}
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Run Tests and Collect Coverage
         run: poetry run -- nox -s test:unit -- --coverage

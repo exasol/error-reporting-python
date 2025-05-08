@@ -16,7 +16,7 @@ jobs:
       - name: Setup Python & Poetry Environment
         uses: exasol/python-toolbox/.github/actions/python-environment@1.1.0
         with:
-          poetry-version: '1.8.5'
+          poetry-version: '2.1.2'
 
       - name: Check Tag Version
         # make sure the pushed/created tag matched the project version
