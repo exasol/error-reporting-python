@@ -22,7 +22,7 @@ jobs:
 
       - name: Check Version(s)
         run: |
-          poetry run version-check exasol/error/version.py
+          poetry run -- version-check exasol/error/version.py
 
   Documentation:
     name: Docs
