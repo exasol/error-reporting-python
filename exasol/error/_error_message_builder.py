@@ -28,9 +28,9 @@ class ErrorMessageBuilder:
             raise InvalidErrorCode(f"{error_code} is an invalid error-code format")
 
         self._error_code = error_code
-        self._message_builder: List[str] = []
-        self._mitigations: List[str] = []
-        self._parameter_dict: Dict[str, Optional[str]] = {}
+        self._message_builder: list[str] = []
+        self._mitigations: list[str] = []
+        self._parameter_dict: dict[str, Optional[str]] = {}
 
     def message(self, message: str, *arguments) -> "ErrorMessageBuilder":
         """

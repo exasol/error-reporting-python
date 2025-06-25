@@ -1,8 +1,8 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import (
     Any,
     Dict,
-    Iterable,
     List,
     Optional,
     Union,
@@ -32,7 +32,7 @@ class Error:
         code: str,
         message: str,
         mitigations: Union[str, Iterable[str]],
-        parameters: Dict[str, Union[str, Parameter]],
+        parameters: dict[str, Union[str, Parameter]],
     ) -> None:
         builder = _exa_error.ExaError.message_builder(code)
         builder.message(message)
@@ -98,8 +98,8 @@ class Error:
 def ExaError(
     code: str,
     message: str,
-    mitigations: Union[str, List[str]],
-    parameters: Dict[str, Union[str, Parameter]],
+    mitigations: Union[str, list[str]],
+    parameters: dict[str, Union[str, Parameter]],
 ) -> Error:
     """Create a new ExaError.
 
@@ -137,7 +137,7 @@ def ExaError(
         )
 
 
-def _create_error_code_definitions(version=None) -> Dict[str, Any]:
+def _create_error_code_definitions(version=None) -> dict[str, Any]:
     from exasol.error.version import VERSION
 
     version = version or VERSION

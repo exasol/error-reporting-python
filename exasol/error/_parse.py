@@ -1,13 +1,15 @@
 import ast
 import io
+from collections.abc import (
+    Generator,
+    Iterable,
+    Iterator,
+)
 from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
     Dict,
-    Generator,
-    Iterable,
-    Iterator,
     List,
     Optional,
     Tuple,
@@ -55,7 +57,7 @@ class _ExaErrorNodeWalker:
 
 
 def _extract_attributes(node: ast.Call) -> _ExaErrorAttributes:
-    kwargs: Dict[str, ast.expr] = {}
+    kwargs: dict[str, ast.expr] = {}
     params = ["code", "message", "mitigations", "parameters"]
 
     for arg in node.args:
@@ -85,19 +87,19 @@ class Validator:
     class ExaValidatedNode:
         code: str
         message: str
-        mitigations: List[str]
-        parameters: List[Tuple[str, str]]
+        mitigations: list[str]
+        parameters: list[tuple[str, str]]
         lineno: int
 
     @dataclass(frozen=True)
     class Result:
-        errors: List[Error]
-        warnings: List["Validator.Warning"]
+        errors: list[Error]
+        warnings: list["Validator.Warning"]
         node: Optional["Validator.ExaValidatedNode"]
 
     def __init__(self) -> None:
-        self._warnings: List["Validator.Warning"] = []
-        self._errors: List[Error] = []
+        self._warnings: list["Validator.Warning"] = []
+        self._errors: list[Error] = []
 
     @property
     def errors(self) -> Iterable[Error]:
@@ -224,7 +226,7 @@ class Validator:
             return message.value
         return None
 
-    def _validate_mitigations(self, node: ast.expr, file: str) -> Optional[List[str]]:
+    def _validate_mitigations(self, node: ast.expr, file: str) -> Optional[list[str]]:
         if mitigation := self._check_node_types(
             ast.List, ast.Constant, node, "mitigations", file
         ):
@@ -258,7 +260,7 @@ class Validator:
                 return [mitigation.value]
         return None
 
-    def normalize(self, params: ast.Dict) -> Iterator[Tuple[str, str]]:
+    def normalize(self, params: ast.Dict) -> Iterator[tuple[str, str]]:
         for k, v in zip(params.keys, params.values):
             if (
                 isinstance(v, ast.Call)
@@ -318,7 +320,7 @@ class Validator:
 
     def _validate_parameters(
         self, node: ast.expr, file: str
-    ) -> Optional[List[Tuple[str, str]]]:
+    ) -> Optional[list[tuple[str, str]]]:
 
         if parameters := self._check_node_type(ast.Dict, node, "parameters", file):
             is_ok = self._validate_parameter_keys(
@@ -335,11 +337,11 @@ class ErrorCollector:
         self._filename = filename
         self._root = root
         self._validator = Validator()
-        self._errors: List[Error] = []
-        self._error_definitions: List[ErrorCodeDetails] = []
+        self._errors: list[Error] = []
+        self._error_definitions: list[ErrorCodeDetails] = []
 
     @property
-    def error_definitions(self) -> List[ErrorCodeDetails]:
+    def error_definitions(self) -> list[ErrorCodeDetails]:
         return self._error_definitions
 
     @property
@@ -394,7 +396,7 @@ class ErrorCollector:
                 self._error_definitions.append(error_definition)
 
 
-def parse_file(file: Union[str, Path, io.TextIOBase]) -> Tuple[
+def parse_file(file: Union[str, Path, io.TextIOBase]) -> tuple[
     Iterable[ErrorCodeDetails],
     Iterable["Validator.Warning"],
     Iterable[Error],

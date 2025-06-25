@@ -1,7 +1,7 @@
 import re
+from collections.abc import Iterable
 from typing import (
     Any,
-    Iterable,
 )
 
 from exasol.error._placeholder import Placeholder
