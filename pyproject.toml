@@ -63,10 +63,14 @@ fail-under = 7.0
 max-line-length = 88
 max-module-lines = 800
 
-
 [[tool.mypy.overrides]]
 module = [
     "test.unit.*",
     "test.integration.*",
 ]
 ignore_errors = true
+
+[tool.sonar]
+projectKey = "com.exasol:error-reporting-python"
+hostUrl = "https://sonarcloud.io"
+organization = "exasol"
