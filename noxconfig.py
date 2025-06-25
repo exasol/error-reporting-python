@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from exasol.toolbox.nox.plugin import hookimpl
 from pathlib import Path
 from typing import Iterable
-
-from exasol.toolbox.nox.plugin import hookimpl
 
 
 class UpdateErrorCodes:
@@ -33,7 +32,9 @@ class Config:
 
     root: Path = Path(__file__).parent
     doc: Path = Path(__file__).parent / "doc"
+    source: Path = Path("exasol/error")
     version_file: Path = Path(__file__).parent / "exasol" / "error" / "version.py"
+    python_versions = ["3.9", "3.10", "3.11", "3.12", "3.13"]
     path_filters: Iterable[str] = ("dist", ".eggs", "venv")
     plugins = [UpdateErrorCodes]
 
