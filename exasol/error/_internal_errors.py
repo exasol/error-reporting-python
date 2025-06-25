@@ -16,12 +16,12 @@ from typing import (
 class _ExaStaticError:
     identifier: str
     message: str
-    messagePlaceholders: List[Dict[str, str]]
+    messagePlaceholders: list[dict[str, str]]
     description: Optional[str]
-    mitigations: List[str]
+    mitigations: list[str]
     sourceFile: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Converts the static error to a dictionary, excluding "description" if it is None
         """

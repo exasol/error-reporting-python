@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from exasol.toolbox.nox.plugin import hookimpl
 from pathlib import Path
-from typing import Iterable
+
+from exasol.toolbox.nox.plugin import hookimpl
 
 
 class UpdateErrorCodes:

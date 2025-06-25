@@ -39,11 +39,11 @@ class ErrorCodeDetails:
 
     identifier: str
     message: Optional[str]
-    messagePlaceholders: Optional[List[Placeholder]]
+    messagePlaceholders: Optional[list[Placeholder]]
     description: Optional[str]
     internalDescription: Optional[str]
-    potentialCauses: Optional[List[str]]
-    mitigations: Optional[List[str]]
+    potentialCauses: Optional[list[str]]
+    mitigations: Optional[list[str]]
     sourceFile: Optional[str]
     sourceLine: Optional[int]
     contextHash: Optional[str]

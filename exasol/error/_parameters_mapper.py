@@ -14,16 +14,16 @@ class ParametersMapper:
     placeholders in messages.
     """
 
-    def __init__(self, text: str, arguments: List[str]) -> None:
+    def __init__(self, text: str, arguments: list[str]) -> None:
         self._text = text
         self._parameters = arguments
         self._parameter_idx = 0
-        self._parameter_dict: Dict[str, Optional[str]] = {}
+        self._parameter_dict: dict[str, Optional[str]] = {}
 
     @classmethod
     def get_params_dict(
-        cls, text: str, arguments: List[str]
-    ) -> Dict[str, Optional[str]]:
+        cls, text: str, arguments: list[str]
+    ) -> dict[str, Optional[str]]:
         """
         Create ParametersMapper object and return the generated dictionary
         that maps the placeholders and parameters.
