@@ -66,8 +66,6 @@ max-module-lines = 800
 
 [[tool.mypy.overrides]]
 module = [
-    "noxfile",
-    "noxconfig",
     "test.unit.*",
     "test.integration.*",
 ]
