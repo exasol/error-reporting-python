@@ -49,7 +49,7 @@ AST_NAME_CLASS = "ast.Name" if sys.version_info.minor > 8 else "_ast.Name"
                 )
             ],
         ),
-            (
+        (
             cleandoc(
                 """
                         from exasol import error
@@ -139,7 +139,6 @@ AST_NAME_CLASS = "ast.Name" if sys.version_info.minor > 8 else "_ast.Name"
                 )
             ],
         ),
-
     ],
 )
 def test_ErrorCollector_error_definitions(src, expected):
@@ -362,7 +361,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                 )
             ],
         ),
-(
+        (
             cleandoc(
                 """
                                 from exasol import error
@@ -438,8 +437,8 @@ def test_ErrorCollector_errors(src, expected):
             [],
         ),
         (
-                cleandoc(
-                    """
+            cleandoc(
+                """
                             from exasol import error
                             from exasol.error import Parameter
     
@@ -452,12 +451,12 @@ def test_ErrorCollector_errors(src, expected):
                                 {"param": Parameter("value", "description")},
                             )
                             """
-                ),
-                [],
+            ),
+            [],
         ),
         (
-                cleandoc(
-                    """
+            cleandoc(
+                """
                             from exasol import error
                             from exasol.error import Parameter
 
@@ -470,12 +469,12 @@ def test_ErrorCollector_errors(src, expected):
                                 {"param": Parameter("value", "")},
                             )
                             """
-                ),
-                [],
+            ),
+            [],
         ),
         (
-                cleandoc(
-                    """
+            cleandoc(
+                """
                             from exasol import error
                             from exasol.error import Parameter
 
@@ -488,12 +487,12 @@ def test_ErrorCollector_errors(src, expected):
                                 {"param": Parameter("value", None)},
                             )
                             """
-                ),
-                [],
+            ),
+            [],
         ),
         (
-                cleandoc(
-                    """
+            cleandoc(
+                """
                             from exasol import error
                             from exasol.error import Parameter
 
@@ -506,8 +505,8 @@ def test_ErrorCollector_errors(src, expected):
                                 {"param": Parameter("value")},
                             )
                             """
-                ),
-                [],
+            ),
+            [],
         ),
     ],
 )
