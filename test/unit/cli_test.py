@@ -49,6 +49,97 @@ AST_NAME_CLASS = "ast.Name" if sys.version_info.minor > 8 else "_ast.Name"
                 )
             ],
         ),
+            (
+            cleandoc(
+                """
+                        from exasol import error
+
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            ["no mitigation available"],
+                            {"param": error.Parameter("value", "")},
+                        )
+                        """
+            ),
+            [
+                ErrorCodeDetails(
+                    identifier="E-TEST-1",
+                    message="this is an error",
+                    messagePlaceholders=[
+                        Placeholder(placeholder="param", description="")
+                    ],
+                    description=None,
+                    internalDescription=None,
+                    potentialCauses=None,
+                    mitigations=["no mitigation available"],
+                    sourceFile="<Unknown>",
+                    sourceLine=3,
+                    contextHash=None,
+                )
+            ],
+        ),
+        (
+            cleandoc(
+                """
+                        from exasol import error
+
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            ["no mitigation available"],
+                            {"param": error.Parameter("value", None)},
+                        )
+                        """
+            ),
+            [
+                ErrorCodeDetails(
+                    identifier="E-TEST-1",
+                    message="this is an error",
+                    messagePlaceholders=[
+                        Placeholder(placeholder="param", description="")
+                    ],
+                    description=None,
+                    internalDescription=None,
+                    potentialCauses=None,
+                    mitigations=["no mitigation available"],
+                    sourceFile="<Unknown>",
+                    sourceLine=3,
+                    contextHash=None,
+                )
+            ],
+        ),
+        (
+            cleandoc(
+                """
+                        from exasol import error
+
+                        error1 = error.ExaError(
+                            "E-TEST-1",
+                            "this is an error",
+                            ["no mitigation available"],
+                            {"param": error.Parameter("value")},
+                        )
+                        """
+            ),
+            [
+                ErrorCodeDetails(
+                    identifier="E-TEST-1",
+                    message="this is an error",
+                    messagePlaceholders=[
+                        Placeholder(placeholder="param", description="")
+                    ],
+                    description=None,
+                    internalDescription=None,
+                    potentialCauses=None,
+                    mitigations=["no mitigation available"],
+                    sourceFile="<Unknown>",
+                    sourceLine=3,
+                    contextHash=None,
+                )
+            ],
+        ),
+
     ],
 )
 def test_ErrorCollector_error_definitions(src, expected):
@@ -211,6 +302,96 @@ def test_ErrorCollector_error_definitions(src, expected):
                 )
             ],
         ),
+        (
+            cleandoc(
+                """
+                                from exasol import error
+                                from exasol.error import Parameter
+
+                                var = input("description: ")
+
+                                error1 = error.ExaError(
+                                    "E-TEST-1",
+                                    var,
+                                    ["mitigations"],
+                                    {"param": Parameter("value", "")},
+                                )
+                                """
+            ),
+            [
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters={
+                        "error_element": "message",
+                        "file": "<Unknown>",
+                        "line": "8",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
+                )
+            ],
+        ),
+        (
+            cleandoc(
+                """
+                                from exasol import error
+                                from exasol.error import Parameter
+
+                                var = input("description: ")
+
+                                error1 = error.ExaError(
+                                    "E-TEST-1",
+                                    var,
+                                    ["mitigations"],
+                                    {"param": Parameter("value", None)},
+                                )
+                                """
+            ),
+            [
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters={
+                        "error_element": "message",
+                        "file": "<Unknown>",
+                        "line": "8",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
+                )
+            ],
+        ),
+(
+            cleandoc(
+                """
+                                from exasol import error
+                                from exasol.error import Parameter
+
+                                var = input("description: ")
+
+                                error1 = error.ExaError(
+                                    "E-TEST-1",
+                                    var,
+                                    ["mitigations"],
+                                    {"param": Parameter("value")},
+                                )
+                                """
+            ),
+            [
+                Error(
+                    code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                    message=INVALID_ERROR_CODE_DEFINITION.message,
+                    mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                    parameters={
+                        "error_element": "message",
+                        "file": "<Unknown>",
+                        "line": "8",
+                        "defined_type": f"<class '{AST_NAME_CLASS}'>",
+                    },
+                )
+            ],
+        ),
     ],
 )
 def test_ErrorCollector_errors(src, expected):
@@ -255,6 +436,78 @@ def test_ErrorCollector_errors(src, expected):
                         """
             ),
             [],
+        ),
+        (
+                cleandoc(
+                    """
+                            from exasol import error
+                            from exasol.error import Parameter
+    
+                            var = input("description: ") 
+    
+                            error1 = error.ExaError(
+                                "E-TEST-1",
+                                "this is an error",
+                                ["no mitigation available"],
+                                {"param": Parameter("value", "description")},
+                            )
+                            """
+                ),
+                [],
+        ),
+        (
+                cleandoc(
+                    """
+                            from exasol import error
+                            from exasol.error import Parameter
+
+                            var = input("description: ") 
+
+                            error1 = error.ExaError(
+                                "E-TEST-1",
+                                "this is an error",
+                                ["no mitigation available"],
+                                {"param": Parameter("value", "")},
+                            )
+                            """
+                ),
+                [],
+        ),
+        (
+                cleandoc(
+                    """
+                            from exasol import error
+                            from exasol.error import Parameter
+
+                            var = input("description: ") 
+
+                            error1 = error.ExaError(
+                                "E-TEST-1",
+                                "this is an error",
+                                ["no mitigation available"],
+                                {"param": Parameter("value", None)},
+                            )
+                            """
+                ),
+                [],
+        ),
+        (
+                cleandoc(
+                    """
+                            from exasol import error
+                            from exasol.error import Parameter
+
+                            var = input("description: ") 
+
+                            error1 = error.ExaError(
+                                "E-TEST-1",
+                                "this is an error",
+                                ["no mitigation available"],
+                                {"param": Parameter("value")},
+                            )
+                            """
+                ),
+                [],
         ),
     ],
 )
