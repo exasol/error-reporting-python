@@ -307,10 +307,11 @@ class Validator:
         Checks if value of ast dictionary are of expected type.
         If the values are of expected type, the method returns True, otherwise False.
         """
-
         ret_val = True
         for value in parameter_node.values:
             if isinstance(value, ast.Call):
+                if len(value.args) < 2:
+                    value.args.append(ast.Constant(value=None))
                 description = value.args[1]
                 if not self._check_node_type(
                     ast.Constant, description, "description", file
