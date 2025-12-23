@@ -1,10 +1,3 @@
-from typing import (
-    Any,
-    Dict,
-    List,
-    Optional,
-)
-
 from exasol.error._placeholder_handler import PlaceholderHandler
 
 
@@ -18,12 +11,10 @@ class ParametersMapper:
         self._text = text
         self._parameters = arguments
         self._parameter_idx = 0
-        self._parameter_dict: dict[str, Optional[str]] = {}
+        self._parameter_dict: dict[str, str | None] = {}
 
     @classmethod
-    def get_params_dict(
-        cls, text: str, arguments: list[str]
-    ) -> dict[str, Optional[str]]:
+    def get_params_dict(cls, text: str, arguments: list[str]) -> dict[str, str | None]:
         """
         Create ParametersMapper object and return the generated dictionary
         that maps the placeholders and parameters.
@@ -50,7 +41,7 @@ class ParametersMapper:
                 self._parameter_dict[placeholder.name] = current_parameter
             self._next_parameters()
 
-    def _get_current_parameter(self) -> Optional[str]:
+    def _get_current_parameter(self) -> str | None:
         """
         Return the current parameter, if any.
 

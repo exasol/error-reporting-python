@@ -4,10 +4,6 @@ from dataclasses import (
     dataclass,
     is_dataclass,
 )
-from typing import (
-    List,
-    Optional,
-)
 
 
 class JsonEncoder(json.JSONEncoder):
@@ -27,7 +23,7 @@ class Placeholder:
     """
 
     placeholder: str
-    description: Optional[str]
+    description: str | None
 
 
 @dataclass
@@ -38,12 +34,12 @@ class ErrorCodeDetails:
     """
 
     identifier: str
-    message: Optional[str]
-    messagePlaceholders: Optional[list[Placeholder]]
-    description: Optional[str]
-    internalDescription: Optional[str]
-    potentialCauses: Optional[list[str]]
-    mitigations: Optional[list[str]]
-    sourceFile: Optional[str]
-    sourceLine: Optional[int]
-    contextHash: Optional[str]
+    message: str | None
+    messagePlaceholders: list[Placeholder] | None
+    description: str | None
+    internalDescription: str | None
+    potentialCauses: list[str] | None
+    mitigations: list[str] | None
+    sourceFile: str | None
+    sourceLine: int | None
+    contextHash: str | None

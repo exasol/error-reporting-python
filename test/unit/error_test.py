@@ -1,4 +1,3 @@
-import importlib
 from collections import namedtuple
 from contextlib import contextmanager
 from inspect import cleandoc

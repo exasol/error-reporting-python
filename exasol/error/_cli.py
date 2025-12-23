@@ -4,7 +4,6 @@ import sys
 from enum import IntEnum
 from itertools import chain
 from pathlib import Path
-from typing import List
 
 from exasol.error._parse import (
     Validator,

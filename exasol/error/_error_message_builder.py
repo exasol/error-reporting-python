@@ -1,9 +1,6 @@
 import re
 from typing import (
     Any,
-    Dict,
-    List,
-    Optional,
 )
 
 from exasol.error._parameters_mapper import ParametersMapper
@@ -30,7 +27,7 @@ class ErrorMessageBuilder:
         self._error_code = error_code
         self._message_builder: list[str] = []
         self._mitigations: list[str] = []
-        self._parameter_dict: dict[str, Optional[str]] = {}
+        self._parameter_dict: dict[str, str | None] = {}
 
     def message(self, message: str, *arguments) -> "ErrorMessageBuilder":
         """
@@ -83,7 +80,7 @@ class ErrorMessageBuilder:
         return self
 
     def parameter(
-        self, placeholder: str, value: Any, description: Optional[str] = None
+        self, placeholder: str, value: Any, description: str | None = None
     ) -> "ErrorMessageBuilder":
         """
         Keep the given placeholder with the given parameter in a dictionary.
