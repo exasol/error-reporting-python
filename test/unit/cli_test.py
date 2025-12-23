@@ -10,7 +10,6 @@ from exasol.error._parse import (
     ErrorCodeDetails,
     ErrorCollector,
     Placeholder,
-    Validator,
 )
 
 AST_NAME_CLASS = "ast.Name" if sys.version_info.minor > 8 else "_ast.Name"

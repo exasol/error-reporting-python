@@ -22,6 +22,6 @@ Dependency            Purpose                    License
 `Prysk`_              Testing framework          GPL
 ===================== ========================== ========
 
-.. _Python 3: https://docs.python.org
+.. _Python 3: https://docs.python.org/3
 .. _Pytest: https://docs.pytest.org/en/stable/
 .. _Prysk: https://www.prysk.net

@@ -2,15 +2,10 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import (
     Any,
-    Dict,
-    List,
-    Optional,
-    Union,
 )
 
 from exasol.error import _exa_error
 from exasol.error._error_message_builder import (
-    ErrorMessageBuilder,
     InvalidErrorCode,
 )
 from exasol.error._internal_errors import (
@@ -23,7 +18,7 @@ from exasol.error._internal_errors import (
 @dataclass(frozen=True)
 class Parameter:
     value: str
-    description: Union[None, str]
+    description: None | str
 
 
 class Error:
@@ -31,8 +26,8 @@ class Error:
         self,
         code: str,
         message: str,
-        mitigations: Union[str, Iterable[str]],
-        parameters: dict[str, Union[str, Parameter]],
+        mitigations: str | Iterable[str],
+        parameters: dict[str, str | Parameter],
     ) -> None:
         builder = _exa_error.ExaError.message_builder(code)
         builder.message(message)
@@ -43,7 +38,7 @@ class Error:
         for k, v in parameters.items():
             name = k
             value = v
-            description: Optional[str] = ""
+            description: str | None = ""
             if isinstance(v, Parameter):
                 value = v.value
                 description = v.description
@@ -98,8 +93,8 @@ class Error:
 def ExaError(
     code: str,
     message: str,
-    mitigations: Union[str, list[str]],
-    parameters: dict[str, Union[str, Parameter]],
+    mitigations: str | list[str],
+    parameters: dict[str, str | Parameter],
 ) -> Error:
     """Create a new ExaError.
 

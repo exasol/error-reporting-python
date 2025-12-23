@@ -6,9 +6,6 @@ from inspect import cleandoc
 from pathlib import Path
 from typing import (
     Any,
-    Dict,
-    List,
-    Optional,
 )
 
 
@@ -17,7 +14,7 @@ class _ExaStaticError:
     identifier: str
     message: str
     messagePlaceholders: list[dict[str, str]]
-    description: Optional[str]
+    description: str | None
     mitigations: list[str]
     sourceFile: str
 

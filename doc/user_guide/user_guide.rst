@@ -115,8 +115,6 @@ Error with detailed Parameter(s)
         {"device": Parameter("/dev/sda1", "name of the device")},
     )
 
-Check out the `user guide <doc/user_guide/user_guide.md>`_ for more details.
-
 Tooling
 ~~~~~~~
 

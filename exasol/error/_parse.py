@@ -9,12 +9,8 @@ from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
-    Dict,
-    List,
     Optional,
-    Tuple,
     TypeVar,
-    Union,
 )
 
 from exasol.error._error import Error
@@ -81,7 +77,7 @@ class Validator:
     class Warning:
         message: str
         file: str
-        line_number: Optional[int]
+        line_number: int | None
 
     @dataclass(frozen=True)
     class ExaValidatedNode:
@@ -112,7 +108,7 @@ class Validator:
     def validate(self, node: ast.Call, file: str) -> Result:
         code: ast.Constant
         message: ast.Constant
-        mitigations: Union[ast.Constant, ast.List]
+        mitigations: ast.Constant | ast.List
         parameters: ast.Dict
 
         error_attributes = _extract_attributes(node)
@@ -163,7 +159,7 @@ class Validator:
         node: ast.expr,
         error_attribute: str,
         file: str,
-    ) -> Optional[NodeType]:
+    ) -> NodeType | None:
         """
         This function validates if the given AST node ('node')  matches type 'expected_type'.
         If it matches, then it returns it as type 'expected_type', otherwise it adds it to the internal
@@ -193,7 +189,7 @@ class Validator:
         node: ast.expr,
         error_attribute: str,
         file: str,
-    ) -> Optional[NodeType]:
+    ) -> NodeType | None:
         """
         This function validates if the given AST node ('node')  matches type 'expected_type_one' or 'expected_type_two'.
         If it matches, then it returns it as type `expected_type_one` or `expected_type_two`,
@@ -216,17 +212,17 @@ class Validator:
             return None
         return node
 
-    def _validate_code(self, node: ast.expr, file: str) -> Optional[str]:
+    def _validate_code(self, node: ast.expr, file: str) -> str | None:
         if code := self._check_node_type(ast.Constant, node, "error-codes", file):
             return code.value
         return None
 
-    def _validate_message(self, node: ast.expr, file: str) -> Optional[str]:
+    def _validate_message(self, node: ast.expr, file: str) -> str | None:
         if message := self._check_node_type(ast.Constant, node, "message", file):
             return message.value
         return None
 
-    def _validate_mitigations(self, node: ast.expr, file: str) -> Optional[list[str]]:
+    def _validate_mitigations(self, node: ast.expr, file: str) -> list[str] | None:
         if mitigation := self._check_node_types(
             ast.List, ast.Constant, node, "mitigations", file
         ):
@@ -321,7 +317,7 @@ class Validator:
 
     def _validate_parameters(
         self, node: ast.expr, file: str
-    ) -> Optional[list[tuple[str, str]]]:
+    ) -> list[tuple[str, str]] | None:
 
         if parameters := self._check_node_type(ast.Dict, node, "parameters", file):
             is_ok = self._validate_parameter_keys(
@@ -397,7 +393,7 @@ class ErrorCollector:
                 self._error_definitions.append(error_definition)
 
 
-def parse_file(file: Union[str, Path, io.TextIOBase]) -> tuple[
+def parse_file(file: str | Path | io.TextIOBase) -> tuple[
     Iterable[ErrorCodeDetails],
     Iterable["Validator.Warning"],
     Iterable[Error],

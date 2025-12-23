@@ -1,7 +1,7 @@
 [project]
 name = "exasol-error-reporting"
 version = "1.0.0"
-requires-python = ">=3.9.0,<4.0"
+requires-python = ">=3.10,<4.0"
 description = "Exasol Python Error Reporting"
 authors = [
     {name="Umit Buyuksahin", email="umit.buyuksahin@exasol.com"},
@@ -25,7 +25,7 @@ packages  = [
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2,<9"
 prysk = {extras = ["pytest-plugin"], version = ">=0.15.1"}
-exasol-toolbox = ">=1.5.0"
+exasol-toolbox = "^4.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0"]
@@ -70,7 +70,17 @@ module = [
 ]
 ignore_errors = true
 
+[tool.ruff.lint]
+extend-ignore = [
+    "E",      # Syntax errors
+    "F",      # Pyflakes rules (excluding F401)
+    "UP",     # pyupgrade rules
+    "D",      # Docstring rules
+]
+extend-select = ["F401"]
+unfixable = []
+
 [tool.sonar]
 projectKey = "com.exasol:error-reporting-python"
-hostUrl = "https://sonarcloud.io"
+host.url = "https://sonarcloud.io"
 organization = "exasol"
