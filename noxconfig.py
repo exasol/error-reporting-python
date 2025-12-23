@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from dataclasses import dataclass
 from pathlib import Path
 
+from exasol.toolbox.config import BaseConfig
 from exasol.toolbox.nox.plugin import hookimpl
 
 
@@ -27,17 +26,9 @@ class UpdateErrorCodes:
         return [self.ERROR_CODES]
 
 
-@dataclass(frozen=True)
-class Config:
-    """Project specific configuration used by nox infrastructure"""
-
-    root: Path = Path(__file__).parent
-    doc: Path = Path(__file__).parent / "doc"
-    source: Path = Path("exasol/error")
-    version_file: Path = Path(__file__).parent / "exasol" / "error" / "version.py"
-    python_versions = ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    path_filters: Iterable[str] = ("dist", ".eggs", "venv")
-    plugins = [UpdateErrorCodes]
-
-
-PROJECT_CONFIG = Config()
+PROJECT_CONFIG = BaseConfig(
+    root_path=Path(__file__).parent,
+    project_name="error",
+    python_versions=("3.10", "3.11", "3.12", "3.13"),
+    plugins_for_nox_sessions=(UpdateErrorCodes,),
+)
