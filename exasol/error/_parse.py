@@ -9,8 +9,10 @@ from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
+    Any,
     Optional,
     TypeVar,
+    cast,
 )
 
 from exasol.error._error import Error
@@ -22,6 +24,12 @@ from exasol.error._report import (
     ErrorCodeDetails,
     Placeholder,
 )
+
+
+def _assert_string(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    raise TypeError(f"Unexpected type {type(value)} of {value}")
 
 
 @dataclass(frozen=True)
@@ -214,12 +222,12 @@ class Validator:
 
     def _validate_code(self, node: ast.expr, file: str) -> str | None:
         if code := self._check_node_type(ast.Constant, node, "error-codes", file):
-            return code.value
+            return _assert_string(code.value)
         return None
 
     def _validate_message(self, node: ast.expr, file: str) -> str | None:
         if message := self._check_node_type(ast.Constant, node, "message", file):
-            return message.value
+            return cast(str, message.value)
         return None
 
     def _validate_mitigations(self, node: ast.expr, file: str) -> list[str] | None:
@@ -250,13 +258,18 @@ class Validator:
                     return None
                 else:
                     return [
-                        e.value for e in mitigation.elts if isinstance(e, ast.Constant)
+                        _assert_string(e.value)
+                        for e in mitigation.elts
+                        if isinstance(e, ast.Constant)
                     ]
             elif isinstance(mitigation, ast.Constant):
-                return [mitigation.value]
+                return [_assert_string(mitigation.value)]
         return None
 
     def normalize(self, params: ast.Dict) -> Iterator[tuple[str, str]]:
+        def strings(a: Any, b: Any) -> tuple[str, str]:
+            return _assert_string(a), _assert_string(b)
+
         for k, v in zip(params.keys, params.values):
             if (
                 isinstance(v, ast.Call)
@@ -265,9 +278,9 @@ class Validator:
                 and isinstance(v.args[1], ast.Constant)
                 and v.args[1].value is not None
             ):
-                yield k.value, v.args[1].value
+                yield strings(k.value, v.args[1].value)
             elif isinstance(k, ast.Constant) and k.value is not None:
-                yield k.value, ""
+                yield strings(k.value, "")
 
     def _validate_parameter_keys(self, parameter_node: ast.Dict, file: str) -> bool:
         """
