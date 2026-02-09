@@ -6,6 +6,7 @@ from typing import (
 
 from exasol.error import _exa_error
 from exasol.error._error_message_builder import (
+    ErrorMessageBuilder,
     InvalidErrorCode,
 )
 from exasol.error._internal_errors import (
@@ -88,6 +89,16 @@ class Error:
                 output += formats[part]
 
         return output[:-1]
+
+    def __eq__(self, other: Any) -> bool:
+        def atts(builder: ErrorMessageBuilder):
+            return (
+                builder._error_code,
+                builder._message_builder,
+                builder._parameter_dict,
+            )
+
+        return isinstance(other, Error) and atts(self._error) == atts(other._error)
 
 
 def ExaError(

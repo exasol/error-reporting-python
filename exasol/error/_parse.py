@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import ast
 import io
 from collections.abc import (
@@ -9,8 +11,9 @@ from contextlib import ExitStack
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
-    Optional,
+    Any,
     TypeVar,
+    cast,
 )
 
 from exasol.error._error import Error
@@ -22,6 +25,14 @@ from exasol.error._report import (
     ErrorCodeDetails,
     Placeholder,
 )
+
+N_A = "(n/a)"
+
+
+def _fq_type_name(value: Any) -> str:
+    cls = type(value)
+    module = str(cls.__module__)
+    return cls.__name__ if module == "builtins" else f"{module}.{cls.__name__}"
 
 
 @dataclass(frozen=True)
@@ -44,7 +55,7 @@ class _ExaErrorNodeWalker:
     def __init__(self, root_node: ast.AST) -> None:
         self._root = root_node
 
-    def __iter__(self) -> Generator[ast.Call, None, None]:
+    def __iter__(self) -> Generator[ast.Call]:
         return (
             node
             for node in ast.walk(self._root)
@@ -90,11 +101,11 @@ class Validator:
     @dataclass(frozen=True)
     class Result:
         errors: list[Error]
-        warnings: list["Validator.Warning"]
-        node: Optional["Validator.ExaValidatedNode"]
+        warnings: list[Validator.Warning]
+        node: Validator.ExaValidatedNode | None
 
     def __init__(self) -> None:
-        self._warnings: list["Validator.Warning"] = []
+        self._warnings: list[Validator.Warning] = []
         self._errors: list[Error] = []
 
     @property
@@ -102,7 +113,7 @@ class Validator:
         return self._errors
 
     @property
-    def warnings(self) -> Iterable["Validator.Warning"]:
+    def warnings(self) -> Iterable[Validator.Warning]:
         return self._warnings
 
     def validate(self, node: ast.Call, file: str) -> Result:
@@ -175,12 +186,48 @@ class Validator:
                         "error_element": error_attribute,
                         "file": file,
                         "line": str(node.lineno),
-                        "defined_type": str(type(node)),
+                        "defined_type": _fq_type_name(node),
+                        "value_type": N_A,
                     },
                 )
             )
             return None
         return node
+
+    def _assert_string(
+        self,
+        value: Any,
+        node: ast.expr,
+        error_attribute: str,
+        file: str,
+    ) -> str | None:
+        if isinstance(value, str):
+            return value
+        self._errors.append(
+            Error(
+                code=INVALID_ERROR_CODE_DEFINITION.identifier,
+                message=INVALID_ERROR_CODE_DEFINITION.message,
+                mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
+                parameters={
+                    "error_element": error_attribute,
+                    "file": file,
+                    "line": str(node.lineno),
+                    "defined_type": _fq_type_name(node),
+                    "value_type": _fq_type_name(value),
+                },
+            )
+        )
+        return None
+
+    def _constant_string_value(
+        self,
+        expr: ast.expr,
+        error_attribute: str,
+        file: str,
+    ) -> str | None:
+        if node := self._check_node_type(ast.Constant, expr, error_attribute, file):
+            return self._assert_string(node.value, node, error_attribute, file)
+        return None
 
     def _check_node_types(
         self,
@@ -193,7 +240,7 @@ class Validator:
         """
         This function validates if the given AST node ('node')  matches type 'expected_type_one' or 'expected_type_two'.
         If it matches, then it returns it as type `expected_type_one` or `expected_type_two`,
-        otherwise it adds it to the internal error list and return None.
+        otherwise it adds it to the internal error list and returns None.
         """
         if not isinstance(node, (expected_type_one, expected_type_two)):
             self._errors.append(
@@ -205,7 +252,8 @@ class Validator:
                         "error_element": error_attribute,
                         "file": file,
                         "line": str(node.lineno),
-                        "defined_type": str(type(node)),
+                        "defined_type": _fq_type_name(node),
+                        "value_type": N_A,
                     },
                 )
             )
@@ -213,48 +261,32 @@ class Validator:
         return node
 
     def _validate_code(self, node: ast.expr, file: str) -> str | None:
-        if code := self._check_node_type(ast.Constant, node, "error-codes", file):
-            return code.value
-        return None
+        return self._constant_string_value(node, "code", file)
 
     def _validate_message(self, node: ast.expr, file: str) -> str | None:
-        if message := self._check_node_type(ast.Constant, node, "message", file):
-            return message.value
-        return None
+        return self._constant_string_value(node, "message", file)
+
+    def _string_constants(self, nodes: list[ast.expr], file: str) -> Iterator[str]:
+        return (
+            value
+            for n in nodes
+            if (value := self._constant_string_value(n, "mitigations", file))
+            is not None
+        )
 
     def _validate_mitigations(self, node: ast.expr, file: str) -> list[str] | None:
-        if mitigation := self._check_node_types(
+        mitigation = self._check_node_types(
             ast.List, ast.Constant, node, "mitigations", file
-        ):
-            if isinstance(mitigation, ast.List):
-                invalid = [
-                    e for e in mitigation.elts if not isinstance(e, ast.Constant)
-                ]
-                self._errors.extend(
-                    [
-                        Error(
-                            code=INVALID_ERROR_CODE_DEFINITION.identifier,
-                            message=INVALID_ERROR_CODE_DEFINITION.message,
-                            mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
-                            parameters={
-                                "error_element": "mitigations",
-                                "file": file,
-                                "line": str(node.lineno),
-                                "defined_type": str(type(e)),
-                            },
-                        )
-                        for e in invalid
-                    ]
-                )
-                if invalid:
-                    return None
-                else:
-                    return [
-                        e.value for e in mitigation.elts if isinstance(e, ast.Constant)
-                    ]
-            elif isinstance(mitigation, ast.Constant):
-                return [mitigation.value]
-        return None
+        )
+        if isinstance(mitigation, ast.Constant):
+            value = self._assert_string(
+                mitigation.value, mitigation, "mitigations", file
+            )
+            return None if value is None else [value]
+        elif isinstance(mitigation, ast.List):
+            return list(self._string_constants(mitigation.elts, file))
+        else:
+            return None
 
     def normalize(self, params: ast.Dict) -> Iterator[tuple[str, str]]:
         for k, v in zip(params.keys, params.values):
@@ -263,22 +295,26 @@ class Validator:
                 and isinstance(k, ast.Constant)
                 and k.value is not None
                 and isinstance(v.args[1], ast.Constant)
-                and v.args[1].value is not None
+                and isinstance(v.args[1].value, str)
             ):
-                yield k.value, v.args[1].value
+                yield cast(str, k.value), v.args[1].value
             elif isinstance(k, ast.Constant) and k.value is not None:
-                yield k.value, ""
+                yield cast(str, k.value), ""
 
     def _validate_parameter_keys(self, parameter_node: ast.Dict, file: str) -> bool:
         """
-        Checks if keys of ast dictionary are of expected type.
-        If the keys are of expected type, the method returns True, otherwise False.
+        Checks if keys of ast dictionary are of expected type.  If the
+        keys are of expected type, the method returns True, otherwise False.
         """
         ret_val = True
+        error_element = "parameter keys"
         for key in parameter_node.keys:
-            # The type of ast.Dict.keys is List[Optional[ast.expr]], not List[ast.expr] as someone would expect.
-            # However, trying unit tests with parameters of kind {None: "something"} did not provoke the "key" to be None.
-            # Nevertheless, keep the following error handling, in case of some strange corner case resulting "key" to be None.
+            # The type of ast.Dict.keys is List[ast.expr|None], not
+            # List[ast.expr] as someone would expect. However, trying unit
+            # tests with parameters of kind {None: "something"} did not
+            # provoke the "key" to be None.  Nevertheless, keep the following
+            # error handling, in case of some strange corner case resulting
+            # "key" to be None.
             if key is None:
                 self._errors.append(
                     Error(
@@ -286,15 +322,16 @@ class Validator:
                         message=INVALID_ERROR_CODE_DEFINITION.message,
                         mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
                         parameters={
-                            "error_element": "parameter keys",
+                            "error_element": error_element,
                             "file": file,
                             "line": str(parameter_node.lineno),
                             "defined_type": "NoneType",
+                            "value_type": N_A,
                         },
                     )
                 )
                 ret_val = False
-            elif not self._check_node_type(ast.Constant, key, "key", file):
+            elif self._constant_string_value(key, error_element, file) is None:
                 ret_val = False
         return ret_val
 
@@ -318,7 +355,6 @@ class Validator:
     def _validate_parameters(
         self, node: ast.expr, file: str
     ) -> list[tuple[str, str]] | None:
-
         if parameters := self._check_node_type(ast.Dict, node, "parameters", file):
             is_ok = self._validate_parameter_keys(
                 parameters, file
@@ -346,7 +382,7 @@ class ErrorCollector:
         return list(self._validator.errors) + self._errors
 
     @property
-    def warnings(self) -> Iterable["Validator.Warning"]:
+    def warnings(self) -> Iterable[Validator.Warning]:
         return self._validator.warnings
 
     def _make_error(
@@ -369,12 +405,12 @@ class ErrorCollector:
             contextHash=None,
         )
 
-    def collect(self) -> None:
+    def collect(self) -> ErrorCollector:
         for node in _ExaErrorNodeWalker(self._root):
             validatation_result = self._validator.validate(node, self._filename)
             if validatation_result.errors:
                 # stop if we encountered any error
-                return
+                return self
             if validatation_result.node is None:
                 import traceback
 
@@ -391,11 +427,12 @@ class ErrorCollector:
             else:
                 error_definition = self._make_error(validatation_result.node)
                 self._error_definitions.append(error_definition)
+        return self
 
 
 def parse_file(file: str | Path | io.TextIOBase) -> tuple[
     Iterable[ErrorCodeDetails],
-    Iterable["Validator.Warning"],
+    Iterable[Validator.Warning],
     Iterable[Error],
 ]:
     with ExitStack() as stack:
