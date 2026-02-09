@@ -331,9 +331,7 @@ class Validator:
                     )
                 )
                 ret_val = False
-            elif (
-                value := self._constant_string_value(key, error_element, file)
-            ) is None:
+            elif self._constant_string_value(key, error_element, file) is None:
                 ret_val = False
         return ret_val
 
