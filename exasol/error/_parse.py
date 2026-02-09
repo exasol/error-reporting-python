@@ -269,15 +269,15 @@ class Validator:
         mitigation = self._check_node_types(
             ast.List, ast.Constant, node, "mitigations", file
         )
-        if not mitigation:
-            return None
         if isinstance(mitigation, ast.Constant):
             value = self._assert_string(
                 mitigation.value, mitigation, "mitigations", file
             )
             return None if value is None else [value]
-
-        return list(self._string_constants(mitigation.elts, file))
+        elif isinstance(mitigation, ast.List):
+            return list(self._string_constants(mitigation.elts, file))
+        else:
+            return None
 
     def normalize(self, params: ast.Dict) -> Iterator[tuple[str, str]]:
         for k, v in zip(params.keys, params.values):
