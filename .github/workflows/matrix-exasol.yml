@@ -1,14 +1,14 @@
-name: Build Matrix (All Versions)
+name: Build Matrix (Exasol)
 
 on:
   workflow_call:
     outputs:
       matrix:
-        description: "Generates the all versions build matrix"
-        value: ${{ jobs.all_versions.outputs.matrix }}
+        description: "Generates the exasol version build matrix"
+        value: ${{ jobs.exasol_versions.outputs.matrix }}
 
 jobs:
-  all_versions:
+  exasol_versions:
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
@@ -23,11 +23,11 @@ jobs:
           poetry-version: "2.3.0"
 
       - name: Generate matrix
-        run: poetry run -- nox -s matrix:all
+        run: poetry run -- nox -s matrix:exasol
 
       - id: set-matrix
         run: |
-          echo "matrix=$(poetry run -- nox -s matrix:all)" >> $GITHUB_OUTPUT
+          echo "matrix=$(poetry run -- nox -s matrix:exasol)" >> $GITHUB_OUTPUT
 
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
