@@ -268,7 +268,8 @@ class Validator:
 
     def _string_constants(self, nodes: list[ast.expr], file: str) -> Iterator[str]:
         return (
-            value for n in nodes
+            value
+            for n in nodes
             if (value := self._constant_string_value(n, "mitigations", file))
             is not None
         )
@@ -330,7 +331,9 @@ class Validator:
                     )
                 )
                 ret_val = False
-            elif (value := self._constant_string_value(key, error_element, file)) is None:
+            elif (
+                value := self._constant_string_value(key, error_element, file)
+            ) is None:
                 ret_val = False
         return ret_val
 
