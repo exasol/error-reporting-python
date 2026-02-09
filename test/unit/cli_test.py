@@ -320,7 +320,7 @@ def test_ErrorCollector_error_definitions(src, expected):
 )
 def test_error_definition_not_constant(src, expected):
     """
-    Error definitions in python files may only use constant values.  This
+    Error definitions in Python files may only use constant values. This
     test verifies parsing errors for non-constant values being used as error
     code, description, or in the list of parameters.
     """
@@ -364,7 +364,7 @@ def expected_error(element_name: str, type_name: str):
 def test_value_not_string(src, expected) -> None:
     """
     Verify parsing errors in case a non-string value is provided for an
-    error attribute such as code, message, mitigation.
+    error attribute such as code, message or mitigation.
     """
     expected_error = Error(
         code=INVALID_ERROR_CODE_DEFINITION.identifier,

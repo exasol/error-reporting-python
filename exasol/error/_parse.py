@@ -309,8 +309,8 @@ class Validator:
         ret_val = True
         error_element = "parameter keys"
         for key in parameter_node.keys:
-            # The type of ast.Dict.keys is List[Optional[ast.expr]], not
-            # List[ast.expr] as someone would expect.  However, trying unit
+            # The type of ast.Dict.keys is List[ast.expr|None], not
+            # List[ast.expr] as someone would expect. However, trying unit
             # tests with parameters of kind {None: "something"} did not
             # provoke the "key" to be None.  Nevertheless, keep the following
             # error handling, in case of some strange corner case resulting
