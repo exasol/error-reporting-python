@@ -258,25 +258,26 @@ class Validator:
             return self._assert_string(message.value, message, "message", file)
         return None
 
-    def _validate_mitigations(self, node: ast.expr, file: str) -> list[str] | None:
-        def string_constants(elements: list[ast.expr]) -> Iterator[str]:
-            for e in elements:
-                if node := self._check_node_type(ast.Constant, e, "mitigations", file):
-                    value = self._assert_string(node.value, node, "mitigations", file)
-                    if value is not None:
-                        yield value
+    def _string_constants(self, nodes: list[ast.expr], file: str) -> Iterator[str]:
+        for e in nodes:
+            if node := self._check_node_type(ast.Constant, e, "mitigations", file):
+                value = self._assert_string(node.value, node, "mitigations", file)
+                if value is not None:
+                    yield value
 
-        if mitigation := self._check_node_types(
+    def _validate_mitigations(self, node: ast.expr, file: str) -> list[str] | None:
+        mitigation = self._check_node_types(
             ast.List, ast.Constant, node, "mitigations", file
-        ):
-            if isinstance(mitigation, ast.List):
-                return list(string_constants(mitigation.elts))
-            elif isinstance(mitigation, ast.Constant):
-                value = self._assert_string(
-                    mitigation.value, mitigation, "mitigations", file
-                )
-                return None if value is None else [value]
-        return None
+        )
+        if not mitigation:
+            return None
+        if isinstance(mitigation, ast.Constant):
+            value = self._assert_string(
+                mitigation.value, mitigation, "mitigations", file
+            )
+            return None if value is None else [value]
+
+        return list(self._string_constants(mitigation.elts, file))
 
     def normalize(self, params: ast.Dict) -> Iterator[tuple[str, str]]:
         for k, v in zip(params.keys, params.values):
