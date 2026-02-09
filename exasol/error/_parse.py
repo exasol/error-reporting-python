@@ -26,6 +26,8 @@ from exasol.error._report import (
     Placeholder,
 )
 
+N_A = "(n/a)"
+
 
 def _fq_type_name(value: Any) -> str:
     cls = type(value)
@@ -185,7 +187,7 @@ class Validator:
                         "file": file,
                         "line": str(node.lineno),
                         "defined_type": _fq_type_name(node),
-                        "value_type": "(n/a)",
+                        "value_type": N_A,
                     },
                 )
             )
@@ -217,6 +219,16 @@ class Validator:
         )
         return None
 
+    def _constant_string_value(
+        self,
+        expr: ast.expr,
+        error_attribute: str,
+        file: str,
+    ) -> str | None:
+        if node := self._check_node_type(ast.Constant, expr, error_attribute, file):
+            return self._assert_string(node.value, node, error_attribute, file)
+        return None
+
     def _check_node_types(
         self,
         expected_type_one: type[NodeType],
@@ -241,7 +253,7 @@ class Validator:
                         "file": file,
                         "line": str(node.lineno),
                         "defined_type": _fq_type_name(node),
-                        "value_type": "(n/a)",
+                        "value_type": N_A,
                     },
                 )
             )
@@ -249,21 +261,17 @@ class Validator:
         return node
 
     def _validate_code(self, node: ast.expr, file: str) -> str | None:
-        if code := self._check_node_type(ast.Constant, node, "code", file):
-            return self._assert_string(code.value, code, "code", file)
-        return None
+        return self._constant_string_value(node, "code", file)
 
     def _validate_message(self, node: ast.expr, file: str) -> str | None:
-        if message := self._check_node_type(ast.Constant, node, "message", file):
-            return self._assert_string(message.value, message, "message", file)
-        return None
+        return self._constant_string_value(node, "message", file)
 
     def _string_constants(self, nodes: list[ast.expr], file: str) -> Iterator[str]:
-        for e in nodes:
-            if node := self._check_node_type(ast.Constant, e, "mitigations", file):
-                value = self._assert_string(node.value, node, "mitigations", file)
-                if value is not None:
-                    yield value
+        return (
+            value for n in nodes
+            if (value := self._constant_string_value(n, "mitigations", file))
+            is not None
+        )
 
     def _validate_mitigations(self, node: ast.expr, file: str) -> list[str] | None:
         mitigation = self._check_node_types(
@@ -298,6 +306,7 @@ class Validator:
         keys are of expected type, the method returns True, otherwise False.
         """
         ret_val = True
+        error_element = "parameter keys"
         for key in parameter_node.keys:
             # The type of ast.Dict.keys is List[Optional[ast.expr]], not
             # List[ast.expr] as someone would expect.  However, trying unit
@@ -312,20 +321,16 @@ class Validator:
                         message=INVALID_ERROR_CODE_DEFINITION.message,
                         mitigations=INVALID_ERROR_CODE_DEFINITION.mitigations,
                         parameters={
-                            "error_element": "parameter keys",
+                            "error_element": error_element,
                             "file": file,
                             "line": str(parameter_node.lineno),
                             "defined_type": "NoneType",
-                            "value_type": "(n/a)",
+                            "value_type": N_A,
                         },
                     )
                 )
                 ret_val = False
-                continue
-            node = self._check_node_type(ast.Constant, key, "parameter keys", file)
-            if not node:
-                ret_val = False
-            elif self._assert_string(node.value, key, "parameter keys", file) is None:
+            elif (value := self._constant_string_value(key, error_element, file)) is None:
                 ret_val = False
         return ret_val
 
