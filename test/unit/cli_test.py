@@ -333,64 +333,39 @@ def test_error_definition_not_constant(src, expected):
 @dataclass(frozen=True)
 class ExpectedError:
     element: str
-    line: str
     type_name: str
 
 
-def expected_error(element_name: str, line: int, type_name: str):
-    return ExpectedError(element_name, str(line + 2), type_name)
+def expected_error(element_name: str, type_name: str):
+    return ExpectedError(element_name, type_name)
 
 
 @pytest.mark.parametrize(
     ["src", "expected"],
     [
         (
-            """
-            ExaError(
-                123,
-                "descriptive text",
-                ["proposed mitigation"],
-                {},
-            )
-            """,
-            expected_error("code", 2, "int"),
+            'ExaError(123, "message", ["mitigation"], {})',
+            expected_error("code", "int"),
         ),
         (
-            """
-            ExaError(
-                "E-TEST-1",
-                True,
-                ["proposed mitigation"],
-                {},
-            )
-            """,
-            expected_error("message", 3, "bool"),
+            'ExaError("E-TEST-1", True, ["mitigation"], {})',
+            expected_error("message", "bool"),
         ),
         (
-            """
-            ExaError(
-                "E-TEST-1",
-                "descriptive text",
-                0.5,
-                {},
-            )
-            """,
-            expected_error("mitigations", 4, "float"),
+            'ExaError("E-TEST-1", "descriptive text", 0.5, {})',
+            expected_error("mitigations", "float"),
         ),
         (
-            """
-            ExaError(
-                "E-TEST-1",
-                "descriptive text",
-                ["proposed mitigation"],
-                {123: Parameter("value")},
-            )
-            """,
-            expected_error("parameter keys", 5, "int"),
+            'ExaError("E-TEST-1", "message", ["mitigation"], {123: Parameter("value")})',
+            expected_error("parameter keys", "int"),
         ),
     ],
 )
 def test_value_not_string(src, expected) -> None:
+    """
+    Verify parsing errors in case a non-string value is provided for an
+    error attribute such as code, message, mitigation.
+    """
     expected_error = Error(
         code=INVALID_ERROR_CODE_DEFINITION.identifier,
         message=INVALID_ERROR_CODE_DEFINITION.message,
@@ -398,12 +373,12 @@ def test_value_not_string(src, expected) -> None:
         parameters={
             "error_element": expected.element,
             "file": "<Unknown>",
-            "line": expected.line,
+            "line": "3",
             "defined_type": AST_CONSTANT_CLASS,
             "value_type": expected.type_name,
         },
     )
-    node = ast.parse("from exasol.error import ExaError, Parameter\n\n" + cleandoc(src))
+    node = ast.parse("from exasol.error import ExaError, Parameter\n\n" + src)
     collector = ErrorCollector(node).collect()
     actual = list(collector.errors)
     assert actual == [expected_error]
