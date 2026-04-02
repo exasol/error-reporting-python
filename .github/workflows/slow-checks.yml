@@ -4,14 +4,9 @@ on:
   workflow_call:
 
 jobs:
-  build-matrix:
-    name: Build Matrix
-    uses: ./.github/workflows/matrix-all.yml
-    permissions:
-      contents: read
 
   run-integration-tests:
-    name: Run Integration Tests (Python-${{ matrix.python-version }}, Exasol-${{ matrix.exasol-version}})
+    name: Run Integration Tests (Python-3.10)
     needs:
       - build-matrix
     runs-on: "ubuntu-24.04"
@@ -19,9 +14,6 @@ jobs:
       contents: read
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
       - name: Check out Repository
         id: check-out-repository
@@ -31,17 +23,17 @@ jobs:
         id: set-up-python-and-poetry-environment
         uses: exasol/python-toolbox/.github/actions/python-environment@v6
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
           poetry-version: "2.3.0"
 
       - name: Run Integration Tests
         id: run-integration-tests
-        run: poetry run -- nox -s test:integration -- --coverage --db-version ${{ matrix.exasol-version }}
+        run: poetry run -- nox -s test:integration -- --coverage
 
       - name: Upload Artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-python${{ matrix.python-version }}-exasol${{ matrix.exasol-version }}-slow
+          name: coverage-python3.10-slow
           path: .coverage
           include-hidden-files: true

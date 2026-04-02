@@ -12,4 +12,6 @@
 /.github/workflows/merge-gate.yml	 linguist-generated
 /.github/workflows/pr-merge.yml		 linguist-generated
 /.github/workflows/report.yml		 linguist-generated
-/.github/workflows/slow-checks.yml       linguist-generated
+
+# manually modified
+# /.github/workflows/slow-checks.yml       linguist-generated
