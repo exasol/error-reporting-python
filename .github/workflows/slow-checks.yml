@@ -11,10 +11,10 @@ jobs:
       permissions:
         contents: read
 
-    needs:
-      - build-matrix
   run-integration-tests:
     name: Run Integration Tests (Python-${{ matrix.python-version }})
+    needs:
+      - build-matrix
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
