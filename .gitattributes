@@ -1,17 +1,19 @@
 /poetry.lock                             linguist-generated
 /error-codes.json                        linguist-generated
 /.github/workflows/build-and-publish.yml linguist-generated
-/.github/workflows/cd.yml		 linguist-generated
+/.github/workflows/cd.yml                linguist-generated
 /.github/workflows/check-release-tag.yml linguist-generated
-/.github/workflows/checks.yml		 linguist-generated
-/.github/workflows/ci.yml		 linguist-generated
-/.github/workflows/gh-pages.yml		 linguist-generated
-/.github/workflows/matrix-all.yml	 linguist-generated
-/.github/workflows/matrix-exasol.yml	 linguist-generated
-/.github/workflows/matrix-python.yml	 linguist-generated
-/.github/workflows/merge-gate.yml	 linguist-generated
-/.github/workflows/pr-merge.yml		 linguist-generated
-/.github/workflows/report.yml		 linguist-generated
+/.github/workflows/checks.yml            linguist-generated
+/.github/workflows/ci.yml                linguist-generated
+/.github/workflows/gh-pages.yml          linguist-generated
+/.github/workflows/matrix-python.yml     linguist-generated
+/.github/workflows/merge-gate.yml        linguist-generated
+/.github/workflows/pr-merge.yml          linguist-generated
+/.github/workflows/report.yml            linguist-generated
 
 # manually modified
 # /.github/workflows/slow-checks.yml       linguist-generated
+# /.github/workflows/matrix-all.yml      linguist-generated
+
+# removed
+# /.github/workflows/matrix-exasol.yml   linguist-generated
