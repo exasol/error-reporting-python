@@ -7,9 +7,7 @@ from exasol.error._report import ErrorCodeDetails
 
 # regression test for GitHub Issue #26
 def test_single_mitigation():
-    f = io.StringIO(
-        initial_value=cleandoc(
-            """
+    f = io.StringIO(initial_value=cleandoc("""
         from exasol import error
         from exasol.error import Parameter
 
@@ -21,9 +19,7 @@ def test_single_mitigation():
             "no mitigation available",
             {},
         )
-        """
-        )
-    )
+        """))
 
     expected_definitions = [
         ErrorCodeDetails(

@@ -63,16 +63,12 @@ UNKNOWN_EXCEPTION_OCCURED = _ExaStaticError(
         }
     ],
     description="An unexpected error occurred during the creation of the error",
-    mitigations=[
-        cleandoc(
-            """
+    mitigations=[cleandoc("""
             A good starting point would be to investigate the cause of the attached exception.
 
             Trackback:
                 {{traceback}}
-            """
-        )
-    ],
+            """)],
     sourceFile=Path(__file__).name,
 )
 
@@ -98,16 +94,12 @@ INVALID_ERROR_CODE_DEFINITION = _ExaStaticError(
     description="An unexpected error occurred during "
     "the creation of the error catalog, "
     "when parsing the project for EXA error codes.",
-    mitigations=[
-        cleandoc(
-            """
+    mitigations=[cleandoc("""
             Check the definition of ExaError. Possible errors:
             1. Usage of none-constant expression in error code, message
             2. Mitigations are not a list, but another container
             3. Invalid definition of parameters.
-            """
-        )
-    ],
+            """)],
     sourceFile=Path(__file__).name,
 )
 
@@ -121,14 +113,10 @@ INTERNAL_ERROR_WHEN_CREATING_ERROR_CATALOG = _ExaStaticError(
         }
     ],
     description="This error signals a programming error in the exasol.error library.",
-    mitigations=[
-        cleandoc(
-            """
+    mitigations=[cleandoc("""
             Open a bug ticket at
             https://github.com/exasol/error-reporting-python/issues/new?template=bug.md
-            """
-        )
-    ],
+            """)],
     sourceFile=Path(__file__).name,
 )
 

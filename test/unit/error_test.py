@@ -24,13 +24,11 @@ def does_not_raise():
     "expected,data",
     [
         (
-            cleandoc(
-                """
+            cleandoc("""
                             E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
                             * Delete something from '/dev/sda1'.
                             * Create larger partition.
-                            """
-            ),
+                            """),
             Data(
                 code="E-TEST-1",
                 message="Not enough space on device {{device}}.",
@@ -42,13 +40,11 @@ def does_not_raise():
             ),
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                                 E-TEST-1: Not enough space on device '/dev/sda1'. Known mitigations:
                                 * Delete something from '/dev/sda1'.
                                 * Create larger partition.
-                                """
-            ),
+                                """),
             Data(
                 code="E-TEST-1",
                 message="Not enough space on device {{device}}.",
@@ -126,11 +122,9 @@ def test_raising_message_builder(data):
         mock.message_builder = builder
         error = ExaError(data.code, data.message, data.mitigations, data.parameters)
     actual = str(error)
-    expected = cleandoc(
-        """
+    expected = cleandoc("""
         E-ERP-2: Unknown error/exception occurred. A good starting point would be to investigate the cause of the attached exception.
 
         Trackback:
-    """
-    )
+    """)
     assert expected in actual
