@@ -7,8 +7,6 @@ jobs:
 
   run-integration-tests:
     name: Run Integration Tests (Python-3.10)
-    needs:
-      - build-matrix
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
