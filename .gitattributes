@@ -13,7 +13,7 @@
 
 # manually modified
 # /.github/workflows/slow-checks.yml       linguist-generated
-# /.github/workflows/matrix-all.yml      linguist-generated
 
 # removed
+# /.github/workflows/matrix-all.yml      linguist-generated
 # /.github/workflows/matrix-exasol.yml   linguist-generated
