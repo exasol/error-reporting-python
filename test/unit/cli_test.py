@@ -26,8 +26,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
     ["src", "expected"],
     [
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
 
                 error1 = error.ExaError(
@@ -36,8 +35,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
                     ["no mitigation available"],
                     {"param": error.Parameter("value", "description")},
                 )
-                """
-            ),
+                """),
             [
                 ErrorCodeDetails(
                     identifier="E-TEST-1",
@@ -56,8 +54,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
             ],
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
 
                 error1 = error.ExaError(
@@ -66,8 +63,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
                     ["no mitigation available"],
                     {"param": error.Parameter("value", "")},
                 )
-                """
-            ),
+                """),
             [
                 ErrorCodeDetails(
                     identifier="E-TEST-1",
@@ -86,8 +82,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
             ],
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
 
                 error1 = error.ExaError(
@@ -96,8 +91,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
                     ["no mitigation available"],
                     {"param": error.Parameter("value", None)},
                 )
-                """
-            ),
+                """),
             [
                 ErrorCodeDetails(
                     identifier="E-TEST-1",
@@ -116,8 +110,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
             ],
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
 
                 error1 = error.ExaError(
@@ -126,8 +119,7 @@ AST_CONSTANT_CLASS = "ast.Constant" if sys.version_info.minor > 8 else "_ast.Con
                     ["no mitigation available"],
                     {"param": error.Parameter("value")},
                 )
-                """
-            ),
+                """),
             [
                 ErrorCodeDetails(
                     identifier="E-TEST-1",
@@ -157,8 +149,7 @@ def test_ErrorCollector_error_definitions(src, expected):
     ["src", "expected"],
     [
         pytest.param(
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -170,8 +161,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                     ["no mitigation available"],
                     {"param": Parameter("value", var)},
                 )
-                """
-            ),
+                """),
             [
                 Error(
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
@@ -189,8 +179,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             id="parameter",
         ),
         pytest.param(
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -202,8 +191,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                     ["no mitigation available"],
                     {"param": Parameter("value", "description")},
                 )
-                """
-            ),
+                """),
             [
                 Error(
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
@@ -221,8 +209,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             id="error_code",
         ),
         pytest.param(
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -234,8 +221,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                     [var],
                     {"param": Parameter("value", "description")},
                 )
-                """
-            ),
+                """),
             [
                 Error(
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
@@ -253,8 +239,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             id="mitigation_list",
         ),
         pytest.param(
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -266,8 +251,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                     var,
                     {"param": Parameter("value", "description")},
                 )
-                """
-            ),
+                """),
             [
                 Error(
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
@@ -285,8 +269,7 @@ def test_ErrorCollector_error_definitions(src, expected):
             id="mitigation",
         ),
         pytest.param(
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -298,8 +281,7 @@ def test_ErrorCollector_error_definitions(src, expected):
                     ["mitigations"],
                     {"param": Parameter("value")},
                 )
-                """
-            ),
+                """),
             [
                 Error(
                     code=INVALID_ERROR_CODE_DEFINITION.identifier,
@@ -388,8 +370,7 @@ def test_value_not_string(src, expected) -> None:
     ["src", "expected"],
     [
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -401,13 +382,11 @@ def test_value_not_string(src, expected) -> None:
                     ["no mitigation available"],
                     {"param": Parameter("value", var)},
                 )
-                """
-            ),
+                """),
             [],
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -419,13 +398,11 @@ def test_value_not_string(src, expected) -> None:
                     ["no mitigation available"],
                     {"param": Parameter("value", "description")},
                 )
-                """
-            ),
+                """),
             [],
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -437,13 +414,11 @@ def test_value_not_string(src, expected) -> None:
                     ["no mitigation available"],
                     {"param": Parameter("value", "")},
                 )
-                """
-            ),
+                """),
             [],
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -455,13 +430,11 @@ def test_value_not_string(src, expected) -> None:
                     ["no mitigation available"],
                     {"param": Parameter("value", None)},
                 )
-                """
-            ),
+                """),
             [],
         ),
         (
-            cleandoc(
-                """
+            cleandoc("""
                 from exasol import error
                 from exasol.error import Parameter
 
@@ -473,8 +446,7 @@ def test_value_not_string(src, expected) -> None:
                     ["no mitigation available"],
                     {"param": Parameter("value")},
                 )
-                """
-            ),
+                """),
             [],
         ),
     ],

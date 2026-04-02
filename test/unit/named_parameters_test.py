@@ -30,9 +30,7 @@ def expected():
 
 
 def test_use_only_named_parameters(expected):
-    file = io.StringIO(
-        initial_value=cleandoc(
-            """
+    file = io.StringIO(initial_value=cleandoc("""
         from exasol import error
         from exasol.error import Parameter
 
@@ -44,9 +42,7 @@ def test_use_only_named_parameters(expected):
             mitigations="no mitigation available",
             parameters={},
         )
-        """
-        )
-    )
+        """))
 
     expected_defs, expected_warnings, expected_errors = expected
     definitions, warnings, errors = parse_file(file)
@@ -57,9 +53,7 @@ def test_use_only_named_parameters(expected):
 
 
 def test_dont_name_the_code_parameter(expected):
-    file = io.StringIO(
-        initial_value=cleandoc(
-            """
+    file = io.StringIO(initial_value=cleandoc("""
         from exasol import error
         from exasol.error import Parameter
 
@@ -71,9 +65,7 @@ def test_dont_name_the_code_parameter(expected):
             mitigations="no mitigation available",
             parameters={},
         )
-        """
-        )
-    )
+        """))
 
     expected_defs, expected_warnings, expected_errors = expected
     definitions, warnings, errors = parse_file(file)
@@ -84,9 +76,7 @@ def test_dont_name_the_code_parameter(expected):
 
 
 def test_dont_name_the_code_and_message_parameter(expected):
-    file = io.StringIO(
-        initial_value=cleandoc(
-            """
+    file = io.StringIO(initial_value=cleandoc("""
         from exasol import error
         from exasol.error import Parameter
 
@@ -98,9 +88,7 @@ def test_dont_name_the_code_and_message_parameter(expected):
             mitigations="no mitigation available",
             parameters={},
         )
-        """
-        )
-    )
+        """))
 
     expected_defs, expected_warnings, expected_errors = expected
     definitions, warnings, errors = parse_file(file)
@@ -111,9 +99,7 @@ def test_dont_name_the_code_and_message_parameter(expected):
 
 
 def test_dont_name_the_code_message_and_mitigations_parameter(expected):
-    file = io.StringIO(
-        initial_value=cleandoc(
-            """
+    file = io.StringIO(initial_value=cleandoc("""
         from exasol import error
         from exasol.error import Parameter
 
@@ -125,9 +111,7 @@ def test_dont_name_the_code_message_and_mitigations_parameter(expected):
             "no mitigation available",
             parameters={},
         )
-        """
-        )
-    )
+        """))
 
     expected_defs, expected_warnings, expected_errors = expected
     definitions, warnings, errors = parse_file(file)
@@ -138,9 +122,7 @@ def test_dont_name_the_code_message_and_mitigations_parameter(expected):
 
 
 def test_dont_name_any_parameter(expected):
-    file = io.StringIO(
-        initial_value=cleandoc(
-            """
+    file = io.StringIO(initial_value=cleandoc("""
         from exasol import error
         from exasol.error import Parameter
 
@@ -152,9 +134,7 @@ def test_dont_name_any_parameter(expected):
             "no mitigation available",
             {},
         )
-        """
-        )
-    )
+        """))
 
     expected_defs, expected_warnings, expected_errors = expected
     definitions, warnings, errors = parse_file(file)
