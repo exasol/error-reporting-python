@@ -36,7 +36,6 @@ dev = [
     "pytest>=7.1.2,<9",
     "prysk[pytest-plugin]>=0.15.1",
     "exasol-toolbox>=7, <8",
-    "requests>2.33",  # see https://github.com/exasol/error-reporting-python/issues/78
 ]
 
 [tool.poetry]
