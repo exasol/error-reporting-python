@@ -1,40 +1,53 @@
 [project]
 name = "exasol-error-reporting"
 version = "1.1.0"
-requires-python = ">=3.10,<4.0"
 description = "Exasol Python Error Reporting"
 authors = [
-    {name="Umit Buyuksahin", email="umit.buyuksahin@exasol.com"},
-    {name="Torsten Kilias", email="torsten.kilias@exasol.com"},
-    {name="Nicola Coretti", email="nicola.coretti@exasol.com"},
+    { name = "Umit Buyuksahin", email = "umit.buyuksahin@exasol.com" },
+    { name = "Torsten Kilias", email = "torsten.kilias@exasol.com" },
+    { name = "Nicola Coretti", email = "nicola.coretti@exasol.com" },
 ]
+requires-python = ">=3.10,<4.0"
+readme = "README.md"
 license = "MIT"
-readme = 'README.md'
-keywords = ['exasol', 'python', 'error-reporting']
+keywords = [
+    "exasol",
+    "python",
+    "error-reporting",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
 
 [project.urls]
 repository = "https://github.com/exasol/error-reporting-python"
 homepage = "https://github.com/exasol/error-reporting-python"
 
+[project.scripts]
+ec = "exasol.error._cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.1.2,<9",
+    "prysk[pytest-plugin]>=0.15.1",
+    "exasol-toolbox>=7, <8",
+    "requests>2.33",  # see https://github.com/exasol/error-reporting-python/issues/78
+]
+
 [tool.poetry]
-requires-poetry = ">=2.1.0"
+requires-poetry = ">=2.3.0"
 packages  = [
     {include = "exasol"}
 ]
 
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.1.2,<9"
-prysk = {extras = ["pytest-plugin"], version = ">=0.15.1"}
-exasol-toolbox = ">=7, <8"
-requests = ">2.33" # see https://github.com/exasol/error-reporting-python/issues/78
-
 [build-system]
 requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-ec = 'exasol.error._cli:main'
-
 
 [tool.coverage.run]
 relative_files = true
