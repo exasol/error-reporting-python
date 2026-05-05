@@ -144,9 +144,9 @@ def ExaError(
 
 
 def _create_error_code_definitions(version=None) -> dict[str, Any]:
-    from exasol.error.version import VERSION
+    from exasol.error._metadata import __version__
 
-    version = version or VERSION
+    version = version or __version__
     return {
         "$schema": "https://schemas.exasol.com/error_code_report-1.0.0.json",
         "projectName": "exasol-error-reporting",
