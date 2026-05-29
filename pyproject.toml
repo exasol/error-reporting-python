@@ -35,7 +35,7 @@ ec = "exasol.error._cli:main"
 dev = [
     "pytest>=7.1.2,<10",
     "prysk[pytest-plugin]>=0.15.1",
-    "exasol-toolbox>=7, <8",
+    "exasol-toolbox>=8.1.1, <9",
 ]
 
 [tool.poetry]
@@ -57,7 +57,6 @@ source = [
 [tool.coverage.report]
 fail_under = 65
 
-
 [tool.black]
 line-length = 88
 verbose = false
@@ -67,7 +66,6 @@ target-version = ["py310"]
 [tool.isort]
 profile = "black"
 force_grid_wrap = 2
-
 
 [tool.pylint.master]
 fail-under = 7.0
@@ -92,6 +90,9 @@ extend-ignore = [
 ]
 extend-select = ["F401"]
 unfixable = []
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
 
 [tool.sonar]
 projectKey = "com.exasol:error-reporting-python"

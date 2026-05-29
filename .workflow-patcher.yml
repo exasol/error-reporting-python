@@ -1,0 +1,7 @@
+workflows:
+  - name: checks
+    # This is needed because this project does not need `matrix-all.yml` or `matrix-exasol.yml`.
+    # This job will be re-activated in:
+    #   https://github.com/exasol/error-reporting-python/issues/85
+    remove_jobs:
+      - check-workflows

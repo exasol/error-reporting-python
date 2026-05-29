@@ -10,4 +10,5 @@
 ## Refactoring
 
 * #78: Removed unneeded requests pin as pysonar removed their pinning
-* #81: Replace version.py with version from package
+* #81: Replaced version.py with version from package
+* #83: Updated PTB to 8.1.1
