@@ -1,19 +1,19 @@
-/poetry.lock                             linguist-generated
-/error-codes.json                        linguist-generated
-/.github/workflows/build-and-publish.yml linguist-generated
-/.github/workflows/cd.yml                linguist-generated
-/.github/workflows/check-release-tag.yml linguist-generated
-/.github/workflows/checks.yml            linguist-generated
-/.github/workflows/ci.yml                linguist-generated
-/.github/workflows/gh-pages.yml          linguist-generated
-/.github/workflows/matrix-python.yml     linguist-generated
-/.github/workflows/merge-gate.yml        linguist-generated
-/.github/workflows/pr-merge.yml          linguist-generated
-/.github/workflows/report.yml            linguist-generated
+# Core Data and Locks
+poetry.lock               linguist-generated=true
+doc/changes/changelog.md  linguist-generated=true
+/error-codes.json         linguist-generated=true
 
-# manually modified
-# /.github/workflows/slow-checks.yml       linguist-generated
-
-# removed
-# /.github/workflows/matrix-all.yml      linguist-generated
-# /.github/workflows/matrix-exasol.yml   linguist-generated
+# PTB GitHub Workflows (CI/CD & Publishing)
+.github/workflows/build-and-publish.yml     linguist-generated=true
+.github/workflows/cd.yml                    linguist-generated=true
+.github/workflows/check-release-tag.yml     linguist-generated=true
+.github/workflows/checks.yml                linguist-generated=true
+.github/workflows/ci.yml                    linguist-generated=true
+.github/workflows/dependency-update.yml     linguist-generated=true
+.github/workflows/fast-tests.yml            linguist-generated=true
+.github/workflows/gh-pages.yml              linguist-generated=true
+.github/workflows/matrix-python.yml         linguist-generated=true
+.github/workflows/merge-gate.yml            linguist-generated=true
+.github/workflows/periodic-validation.yml   linguist-generated=true
+.github/workflows/pr-merge.yml              linguist-generated=true
+.github/workflows/report.yml                linguist-generated=true
