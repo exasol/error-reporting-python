@@ -57,7 +57,6 @@ source = [
 [tool.coverage.report]
 fail_under = 65
 
-
 [tool.black]
 line-length = 88
 verbose = false
@@ -67,7 +66,6 @@ target-version = ["py310"]
 [tool.isort]
 profile = "black"
 force_grid_wrap = 2
-
 
 [tool.pylint.master]
 fail-under = 7.0
