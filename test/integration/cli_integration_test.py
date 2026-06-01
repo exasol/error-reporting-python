@@ -71,9 +71,7 @@ def _run(command: list[str], *args: str, cwd: Path) -> subprocess.CompletedProce
 
 
 def _commands():
-    yield pytest.param(
-        [sys.executable, "-m", "exasol.error"], id="module-entrypoint"
-    )
+    yield pytest.param([sys.executable, "-m", "exasol.error"], id="module-entrypoint")
     ec_path = shutil.which("ec")
     if ec_path:
         yield pytest.param([ec_path], id="console-script")
