@@ -2349,25 +2349,6 @@ wcwidth = "*"
 tests = ["pytest", "pytest-cov", "pytest-lazy-fixtures"]
 
 [[package]]
-name = "prysk"
-version = "0.15.2"
-description = "Functional tests for command line applications"
-optional = false
-python-versions = ">=3.7,<4.0.0"
-groups = ["dev"]
-files = [
-    {file = "prysk-0.15.2-py3-none-any.whl", hash = "sha256:9c571b31166bd0db1b2ea1b6d5f8fb6e6335d6172c9921ee3f9e680f6649a81d"},
-    {file = "prysk-0.15.2.tar.gz", hash = "sha256:953b608561daed91aced9856fcd9e008e963c07e4bf1684d79be0b218d29b8bd"},
-]
-
-[package.dependencies]
-pytest = {version = ">=7.0.1", optional = true, markers = "extra == \"pytest-plugin\""}
-rich = ">=13.3.1,<14.0.0"
-
-[package.extras]
-pytest-plugin = ["pytest (>=7.0.1)"]
-
-[[package]]
 name = "py-serializable"
 version = "2.1.0"
 description = "Library for serializing and deserializing Python Objects to and from JSON and XML."
@@ -3893,4 +3874,4 @@ type = ["pytest-mypy (>=1.0.1) ; platform_python_implementation != \"PyPy\""]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "0bf7929c8b8e3699c6f66635a019a12a86cc1ec56f1d4b48c92467e650d33756"
+content-hash = "8b39bc1b4faf29f33a1b3a98b0bbf487a7d45d3537158759b8b5cf40c2d33542"
