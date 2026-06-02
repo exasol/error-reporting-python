@@ -34,7 +34,6 @@ ec = "exasol.error._cli:main"
 [dependency-groups]
 dev = [
     "pytest>=7.1.2,<10",
-    "prysk[pytest-plugin]>=0.15.1",
     "exasol-toolbox>=8.1.1, <9",
 ]
 

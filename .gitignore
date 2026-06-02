@@ -137,3 +137,6 @@ doc/_build
 
 .lint.json
 .lint.txt
+
+/.serena
+/.codex
