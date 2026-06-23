@@ -11,5 +11,6 @@
 
 * #78: Removed unneeded requests pin as pysonar removed their pinning
 * #81: Replaced version.py with version from package
-* #83: Updated PTB to 8.1.1
-* #85: Re-enabled `check-workflows` in `checks.yml` and updated to PTB 9.0.0 
+* #83: Updated `exasol-toolbox` to 8.1.1
+* #85: Re-enabled `check-workflows` in `checks.yml` and updated to `exasol-toolbox` 9.0.0
+* #90: Updated to `exasol-toolbox` 10.0.0
