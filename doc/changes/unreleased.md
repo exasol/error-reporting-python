@@ -14,3 +14,4 @@
 * #83: Updated `exasol-toolbox` to 8.1.1
 * #85: Re-enabled `check-workflows` in `checks.yml` and updated to `exasol-toolbox` 9.0.0
 * #90: Updated to `exasol-toolbox` 10.0.0
+* #97: Removed support for Python 3.10 and updated to exasol-toolbox version 12.0.0 
