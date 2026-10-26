@@ -33,7 +33,7 @@ ec = "exasol.error._cli:main"
 [dependency-groups]
 dev = [
     "pytest>=7.1.2,<10",
-    "exasol-toolbox>=10.4.0, <11",
+    "exasol-toolbox>=12.0.0, <13",
 ]
 
 [tool.poetry]
